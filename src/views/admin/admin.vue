@@ -7,6 +7,7 @@
     </aside>
     <div class="main">
       <header></header>
+      <i class="fa fa-hand-o-up"></i>
       <div class="tabs"></div>
       <main></main>
     </div>
