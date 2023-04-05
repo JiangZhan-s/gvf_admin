@@ -1,9 +1,6 @@
 <template>
   <div class="gvf_admin">
-    <aside>
-      <div>
-      </div>
-    </aside>
+    <GVFAside></GVFAside>
     <div class="main">
       <header>
         <div class="left">
@@ -17,7 +14,7 @@
           <div class="icon_actions">
             <i class="fa fa-home"></i>
             <GVFTheme></GVFTheme>
-            <i class="fa fa-arrows-alt"></i>
+            <GVFFullScreen></GVFFullScreen>
           </div>
           <div class="avatar">
             <img src="https://img95.699pic.com/element/40151/6832.png_300.png" alt="">
@@ -54,6 +51,8 @@
 
 <script setup>
 import GVFTheme from "../../components/gvf_theme.vue"
+import GVFAside from "../../components/admin/gvf_aside.vue"
+import GVFFullScreen from "../../components/gvf_full_screen.vue"
 import {useRouter} from "vue-router"
 import {ref} from "vue";
 
@@ -70,18 +69,13 @@ function menuClick({key}) {
   })
 }
 
+
 </script>
 
 <style lang="scss">
 .gvf_admin {
   width: 100%;
   display: flex;
-
-  aside {
-    width: 240px;
-    height: 100vh;
-    background-color: var(--slide);
-  }
 
   .main {
     width: calc(100% - 240px);
