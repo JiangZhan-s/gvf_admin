@@ -13,7 +13,7 @@
 }
 
 :root {
-  --active: #99CC33;
+  --active: #1890ff;
   --text: #555
 }
 </style>

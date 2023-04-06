@@ -21,7 +21,9 @@
       </header>
       <div class="tabs"></div>
       <main>
-        <router-view/>
+        <div class="gvf_view">
+          <router-view/>
+        </div>
       </main>
     </div>
   </div>
@@ -87,12 +89,17 @@ import GVFUserInfo from "../../components/gvf_user_info.vue"
 
     .tabs {
       height: 30px;
-      border: 1px solid var(--order);
+      border-color: var(--order);
+      border-style: solid;
+      border-width: 1px 0 1px 0;
     }
 
     main {
       background-color: var(--bg);
       height: calc(100vh - 90px);
+      padding: 20px;
+
+
     }
   }
 }

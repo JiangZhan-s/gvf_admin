@@ -1,11 +1,15 @@
 :root {
     --bg: #f0eeee;
+    --card_bg: white;
     --order: #f0eeee;
     --slide: #2b3539;
+    --card_border: #e2e2e2;
 }
 
 .dark {
     --bg: #2a2a2a;
+    --card_bg: black;
     --order: #252525;
     --slide: #1a1a1a;
+    --card_border: #393939;
 }
