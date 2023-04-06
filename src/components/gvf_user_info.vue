@@ -17,8 +17,11 @@
             <a-menu-item key="file_store">
               <a href="javascript:">我的仓库</a>
             </a-menu-item>
+            <a-menu-item key="login">
+              <a href="javascript:">用户登录</a>
+            </a-menu-item>
             <a-menu-item key="logout">
-              <a href="javascript:">退出登录</a>
+              <a href="javascript:">注销退出</a>
             </a-menu-item>
           </a-menu>
         </template>
@@ -29,8 +32,9 @@
 
 <script setup>
 
-import {useRouter} from "vue-router/dist/vue-router";
+import {useRoute, useRouter} from "vue-router";
 
+const route = useRoute()
 const router = useRouter()
 const props = defineProps({
   //是否显示头像部分
@@ -43,6 +47,15 @@ const props = defineProps({
 function menuClick({key}) {
   if (key === "logout") {
     console.log("logout")
+    return
+  }
+  if (key === "login") {
+    router.push({
+      name: key,
+      query: {
+        redirect_url: route.path
+      }
+    })
     return
   }
   router.push({

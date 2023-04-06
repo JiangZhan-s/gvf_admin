@@ -4,7 +4,7 @@
       <div class="gvf_aside_header flex">
         <div class="gvf_aside_logo flex">
           <img
-              src="../../assets/logo.png"
+              src="../../assets/images/logo.png"
               alt="">
         </div>
         <div class="gvf_aside_title">数据管理系统</div>

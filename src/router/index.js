@@ -24,6 +24,11 @@ const router = createRouter({
                     component: () => import("../views/admin/home/home.vue")
                 },
                 {
+                    path: "upload",
+                    name: "upload",
+                    component: () => import("../views/admin/file_mgr/file_upload.vue"),
+                },
+                {
                     path: "files",
                     name: "files",
                     component: () => import("../views/admin/file_mgr/file_list.vue"),

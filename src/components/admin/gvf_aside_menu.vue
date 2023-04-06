@@ -2,7 +2,6 @@
   <a-menu
       v-model:selectedKeys="selectedKeys"
       mode="inline"
-      theme="dark"
       :inline-collapsed="false"
       @click="goto"
   >
@@ -48,33 +47,40 @@ const data = reactive({
     },
     {
       id: 2,
+      icon: "fa-upload",//图标统一用fa
+      title: "上传文件",//菜单名称
+      name: "upload",//路由名称
+      children: []
+    },
+    {
+      id: 3,
       icon: "fa-folder-open",//图标统一用fa
       title: "我的文件",//菜单名称
       name: "files",//路由名称
       children: []
     },
     {
-      id: 3,
+      id: 4,
       icon: "fa-th-large",//图标统一用fa
       title: "文件格式",//菜单名称
       name: "",//路由名称
       children: [
         {
-          id: 4,
+          id: 5,
           icon: "fa-file-text-o",//图标统一用fa
           title: "文档",//菜单名称
           name: "file_text",//路由名称
           children: []
         },
         {
-          id: 5,
+          id: 6,
           icon: "fa-file-movie-o",//图标统一用fa
           title: "影音",//菜单名称
           name: "file_movie",//路由名称
           children: []
         },
         {
-          id: 6,
+          id: 7,
           icon: "fa-file-picture-o",//图标统一用fa
           title: "图片",//菜单名称
           name: "file_picture",//路由名称
@@ -95,5 +101,27 @@ function goto(event) {
 </script>
 
 <style>
+.ant-menu {
+  background-color: var(--slide_bg);
+  color: white;
+}
+
+.ant-menu-submenu-arrow {
+  color: white;
+}
+
+.ant-menu-sub.ant-menu-inline {
+  background-color: var(--slide_sub_bg);
+}
+
+.ant-menu-inline .ant-menu-item {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/*.ant-menu-item {*/
+/*  margin-bottom: 0;*/
+/*  margin-top: 0;*/
+/*}*/
 
 </style>
