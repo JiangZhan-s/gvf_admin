@@ -16,11 +16,13 @@
             <GVFTheme></GVFTheme>
             <GVFFullScreen></GVFFullScreen>
           </div>
-          <GVFUserInfo></GVFUserInfo>
+          <GVFUserInfo :is-avatar="true"></GVFUserInfo>
         </div>
       </header>
       <div class="tabs"></div>
-      <main></main>
+      <main>
+        <router-view/>
+      </main>
     </div>
   </div>
 </template>

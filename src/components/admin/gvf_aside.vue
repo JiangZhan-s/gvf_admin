@@ -10,13 +10,16 @@
         <div class="gvf_aside_title">数据管理系统</div>
       </div>
       <div class="gvf_aside_body flex">
-
+        <GVFAsideMenu></GVFAsideMenu>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
+
+import GVFAsideMenu from "./gvf_aside_menu.vue"
+
 </script>
 
 <style lang="scss">
