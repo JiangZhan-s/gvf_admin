@@ -45,6 +45,9 @@ import GVFUserInfo from "../../components/gvf_user_info.vue"
 
   .main {
     width: calc(100% - 240px);
+    height: 100vh;
+    overflow-y: auto;
+    background-color: var(--bg);
 
     header {
       height: 60px;
@@ -52,6 +55,7 @@ import GVFUserInfo from "../../components/gvf_user_info.vue"
       display: flex;
       justify-content: space-between;
       align-items: center;
+      background-color: var(--card_bg);
 
       .right {
         display: flex;
@@ -92,14 +96,11 @@ import GVFUserInfo from "../../components/gvf_user_info.vue"
       border-color: var(--order);
       border-style: solid;
       border-width: 1px 0 1px 0;
+      background-color: var(--card_bg);
     }
 
     main {
-      background-color: var(--bg);
-      height: calc(100vh - 90px);
       padding: 20px;
-
-
     }
   }
 }

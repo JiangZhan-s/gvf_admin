@@ -7,3 +7,7 @@ export function fileUploadApi(data) {
         }
     })
 }
+
+export function fileListApi(params) {
+    return Service.get("/api/query_all", {params})
+}
