@@ -19,6 +19,11 @@ Service.interceptors.request.use(request => {
     return request
 })
 
-Service.interceptors.response.use(response => {
-    return response.data
-})
+Service.interceptors.response.use(
+    (response) => {
+        return response.data;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);

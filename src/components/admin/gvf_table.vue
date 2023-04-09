@@ -11,7 +11,7 @@
     </div>
     <div class="gvf_actions">
       <slot name="upload">
-        <a-button type="primary">上传</a-button>
+        <a-button type="primary" @click="uploadModal">上传</a-button>
       </slot>
       <slot name="batchDownload">
         <a-button type="primary" @click="downloadBatch">批量下载</a-button>
@@ -70,7 +70,6 @@
 <script setup>
 import {reactive} from "vue";
 import {getFormatDate} from "../../utils/date";
-import {fileListApi} from "../../api/file_api";
 import {message} from "ant-design-vue";
 import {baseListApi} from "../../api/base_api";
 
@@ -83,7 +82,7 @@ const props = defineProps({
     type: String,
   }
 })
-const emits = defineEmits(["delete", "download"])
+const emits = defineEmits(["delete", "download", "upload"])
 const page = reactive({
   page: 1,
   limit: 5,
@@ -104,6 +103,10 @@ const typeMap = {
 
 function onSelectChange(selectedKeys) {
   data.selectedRowKeys = selectedKeys
+}
+
+function uploadModal() {
+  emits("upload")
 }
 
 function downloadFile(file_id) {

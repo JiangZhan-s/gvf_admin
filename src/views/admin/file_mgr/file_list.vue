@@ -1,17 +1,28 @@
 <template>
-  <GVFTable @delete="fileDelete" @download="fileDownload"
+  <a-modal title="上传文件" v-model:visible="data.modalVisible" @ok="handleOk">
+    <a-upload
+        v-model:file-list="data.fileList"
+        :custom-request="function (){}"
+        list-type="picture-card"
+    >
+      <div v-if="data.fileList.length === 0">
+        <i class="ant-icon ant-icon-plus"></i>
+        <div class="ant-upload-text">上传</div>
+      </div>
+    </a-upload>
+  </a-modal>
+  <GVFTable @delete="fileDelete" @download="fileDownload" @upload="fileUploadModal"
             :columns="data.columns"
             base-url="/api/query_all"
   >
-    <template #upload>
-      <a-button type="primary">上传</a-button>
-    </template>
   </GVFTable>
 </template>
 
 <script setup>
 import GVFTable from "../../../components/admin/gvf_table.vue"
 import {reactive} from "vue";
+import {message} from "ant-design-vue";
+import {fileUploadApi} from "../../../api/file_api";
 
 const data = reactive({
   columns: [
@@ -51,7 +62,43 @@ const data = reactive({
       key: 'action',
     },
   ],
+  modalVisible: false,
+  isOkClicked: false,
+  fileList: [],
 })
+
+function handleOk() {
+  data.isOkClicked = true
+  customRequest()
+}
+
+async function customRequest() {
+  if (!data.isOkClicked) {
+    return;
+  }
+  let file = data.fileList[0].originFileObj; // 获取第一个文件
+  let reader = new FileReader(); // 创建FileReader对象
+  // 读取文件完成后执行回调函数
+  reader.onload = async function () {
+    const arrayBuffer = reader.result; // 获取二进制数据
+    // 将二进制数据上传到服务器
+    const formData = new FormData();
+    // 创建包含二进制数据的Blob对象
+    const blob = new Blob([arrayBuffer], {type: file.type});
+    formData.append('file', blob, file.name);
+    let res = await fileUploadApi(formData);
+    console.log(res)
+  };
+  reader.readAsArrayBuffer(file);
+  data.isOkClicked = false
+  data.modalVisible = false
+}
+
+//展开上传文件的窗口
+function fileUploadModal() {
+  data.modalVisible = true
+  data.isOkClicked = false
+}
 
 function fileDownload(fileIdList) {
   console.log(fileIdList)
