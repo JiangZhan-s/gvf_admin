@@ -22,7 +22,8 @@
 import GVFTable from "../../../components/admin/gvf_table.vue"
 import {reactive} from "vue";
 import {message} from "ant-design-vue";
-import {fileUploadApi} from "../../../api/file_api";
+import {fileDownloadApi, fileUploadApi} from "../../../api/file_api";
+import {saveAs} from "file-saver"
 
 const data = reactive({
   columns: [
@@ -100,8 +101,34 @@ function fileUploadModal() {
   data.isOkClicked = false
 }
 
-function fileDownload(fileIdList) {
-  console.log(fileIdList)
+async function fileDownload(fileIdList) {
+  try {
+    let res = await fileDownloadApi(fileIdList);
+    console.log(res)
+    console.log(res.headers['content-disposition'])
+
+    let contentDisposition = res.headers['content-disposition']; // 获取响应头部中的Content-Disposition字段
+    let fileName = null;
+    let matches = contentDisposition.match(/filename\*?=(UTF-8''|")(.*?)\1/); // 从Content-Disposition中提取编码后的文件名
+    console.log(matches)
+    if (matches && matches.length > 2) {
+      fileName = decodeURIComponent(matches[2]); // 解码文件名
+      console.log("解码文件名1", fileName)
+    } else {
+      matches = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/); // 从Content-Disposition中提取未编码的文件名
+      console.log("matches第二个", matches)
+      if (matches && matches.length > 1) {
+        fileName = decodeURIComponent(matches[1].replace(/^.*?''/, '')); // 处理文件名
+        console.log("解码文件名2", fileName)
+      }
+    }
+
+    const fileData = new Blob([res.data], {type: 'application/octet-stream'}); // 创建 Blob 对象
+    console.log(fileName)
+    saveAs(fileData, fileName); // 使用 saveAs 方法保存文件数据
+  } catch (error) {
+    console.error('文件下载失败：', error);
+  }
 }
 
 function fileDelete(fileIdList) {
