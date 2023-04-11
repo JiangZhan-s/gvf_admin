@@ -21,9 +21,9 @@
 <script setup>
 import GVFTable from "../../../components/admin/gvf_table.vue"
 import {reactive} from "vue";
-import {message} from "ant-design-vue";
 import {fileDownloadApi, fileUploadApi} from "../../../api/file_api";
 import {saveAs} from "file-saver"
+import {message} from "ant-design-vue";
 
 const data = reactive({
   columns: [
@@ -64,6 +64,7 @@ const data = reactive({
     },
   ],
   modalVisible: false,
+  downloadTipVisible: false,
   isOkClicked: false,
   fileList: [],
 })
@@ -89,6 +90,10 @@ async function customRequest() {
     formData.append('file', blob, file.name);
     let res = await fileUploadApi(formData);
     console.log(res)
+    if (res.code === 0) {
+      message.success(res.msg)
+      data.fileList = []
+    }
   };
   reader.readAsArrayBuffer(file);
   data.isOkClicked = false
@@ -102,33 +107,27 @@ function fileUploadModal() {
 }
 
 async function fileDownload(fileIdList) {
+  let res = await fileDownloadApi(fileIdList);
   try {
-    let res = await fileDownloadApi(fileIdList);
-    console.log(res)
-    console.log(res.headers['content-disposition'])
-
     let contentDisposition = res.headers['content-disposition']; // 获取响应头部中的Content-Disposition字段
     let fileName = null;
     let matches = contentDisposition.match(/filename\*?=(UTF-8''|")(.*?)\1/); // 从Content-Disposition中提取编码后的文件名
-    console.log(matches)
     if (matches && matches.length > 2) {
       fileName = decodeURIComponent(matches[2]); // 解码文件名
-      console.log("解码文件名1", fileName)
     } else {
       matches = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/); // 从Content-Disposition中提取未编码的文件名
-      console.log("matches第二个", matches)
       if (matches && matches.length > 1) {
         fileName = decodeURIComponent(matches[1].replace(/^.*?''/, '')); // 处理文件名
-        console.log("解码文件名2", fileName)
       }
     }
-
     const fileData = new Blob([res.data], {type: 'application/octet-stream'}); // 创建 Blob 对象
-    console.log(fileName)
     saveAs(fileData, fileName); // 使用 saveAs 方法保存文件数据
+    console.log(res)
   } catch (error) {
-    console.error('文件下载失败：', error);
+    console.log(error)
+    message.error("数据协同验证失败，拒绝下载请求")
   }
+
 }
 
 function fileDelete(fileIdList) {

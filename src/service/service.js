@@ -1,7 +1,8 @@
 import axios from "axios";
+import {message} from "ant-design-vue";
 
 export const Service = axios.create({
-    timeout: 7000,
+    timeout: 70000,
     baseURL: "",
     headers: {
         "Content-Type": "application/json",
@@ -29,6 +30,11 @@ Service.interceptors.response.use(
         }
     },
     (error) => {
+        if (error.response && error.response.status === 550) {
+            // 处理 500 错误响应
+            // 在此处可以根据具体的情况采取不同的处理方式
+            message.error("链上连下数据协同验证不统一，下载请求被拒绝")
+        }
         return Promise.reject(error);
     }
 );
