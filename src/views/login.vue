@@ -35,6 +35,7 @@ import {emailLoginApi} from "../api/user_api";
 import {parseToken} from "../utils/jwt";
 import {useStore} from "@/stores/store";
 import {useRoute, useRouter} from "vue-router";
+import {folderRootFindApi} from "../api/folder_api";
 
 const route = useRoute()
 const router = useRouter()
@@ -63,6 +64,12 @@ async function emailLogin() {
   let userInfo = parseToken(res.data)
   userInfo.token = res.data
   store.setUserInfo(userInfo)
+  res = await folderRootFindApi()
+  if (res.code) {
+    message.error(res.msg)
+    return
+  }
+  store.setFolderRoot(res.data)
   const redirect_url = route.query.redirect_url
   if (redirect_url === undefined) {
     setTimeout(() => {

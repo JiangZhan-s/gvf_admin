@@ -41,6 +41,9 @@
                 <a-button class="gvf_table_action download" @click="downloadFile(record.ID)" type="primary">下载
                 </a-button>
               </slot>
+              <slot name="share" v-bind="{column,record}">
+                <a-button class="gvf_table_action share" @click="shareFile(record.ID)" type="primary">分享</a-button>
+              </slot>
               <a-popconfirm
                   title="是否确定删除？"
                   ok-text="删除"
@@ -82,7 +85,7 @@ const props = defineProps({
     type: String,
   }
 })
-const emits = defineEmits(["delete", "download", "upload"])
+const emits = defineEmits(["delete", "download", "upload", "share"])
 const page = reactive({
   page: 1,
   limit: 5,
@@ -101,8 +104,13 @@ const typeMap = {
   5: '其他',
 }
 
+
 function onSelectChange(selectedKeys) {
   data.selectedRowKeys = selectedKeys
+}
+
+function shareFile(file_id) {
+  emits("share", [file_id])
 }
 
 function uploadModal() {
@@ -194,6 +202,10 @@ getData()
   }
 
   .gvf_table_action.download {
+    margin-right: 10px;
+  }
+
+  .gvf_table_action.share {
     margin-right: 10px;
   }
 }

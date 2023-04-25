@@ -10,7 +10,8 @@ export const useStore = defineStore('gvf', {
                 role: 0,
                 user_id: 0,
                 exp: 0
-            }
+            },
+            userFolderRoot: -1,
         }
     },
     actions: {
@@ -59,6 +60,21 @@ export const useStore = defineStore('gvf', {
                 return;
             }
             this.setUserInfo(userInfo)
-        }
+        },
+        //设置用户文件夹根目录
+        setFolderRoot(id) {
+            this.$patch({
+                folderRootId: id
+            })
+            //持久化
+            localStorage.setItem("folderRootId", id)
+        },
+        loadFolderRoot() {
+            let folderRootId = localStorage.getItem("folderRootId")
+            if (folderRootId === null) {
+                return
+            }
+            this.setFolderRoot(folderRootId)
+        },
     }
 })

@@ -1,29 +1,42 @@
 <template>
+  <a-modal title="分享码" v-model:visible="data.isShare" @ok="shareOk">
+    <span>{{ data.shareCode }}</span>
+  </a-modal>
   <a-modal title="上传文件" v-model:visible="data.modalVisible" @ok="handleOk">
     <a-upload
         v-model:file-list="data.fileList"
-        :custom-request="function (){}"
+        :custom-request="()=>{}"
         list-type="picture-card"
     >
       <div v-if="data.fileList.length === 0">
         <i class="ant-icon ant-icon-plus"></i>
         <div class="ant-upload-text">上传</div>
       </div>
+      <div v-else>
+
+      </div>
     </a-upload>
   </a-modal>
-  <GVFTable @delete="fileDelete" @download="fileDownload" @upload="fileUploadModal"
+  <GVFTable @delete="fileDelete" @download="fileDownload" @upload="fileUploadModal" @share="fileShare"
             :columns="data.columns"
             base-url="/api/query_all"
   >
   </GVFTable>
+  <GVFProgress
+      :isUploadProgressShow="data.isUploadProgressShow"
+      :uploadProgress="data.uploadProgress"
+      :uploadFileName="data.uploadFileName"
+  ></GVFProgress>
 </template>
 
 <script setup>
 import GVFTable from "../../../components/admin/gvf_table.vue"
+import GVFProgress from "../../../components/progressDialog/ProgressDialog.vue"
 import {reactive} from "vue";
 import {fileDownloadApi, fileUploadApi} from "../../../api/file_api";
 import {saveAs} from "file-saver"
 import {message} from "ant-design-vue";
+import {shareGenerateApi} from "../../../api/share_api";
 
 const data = reactive({
   columns: [
@@ -67,37 +80,72 @@ const data = reactive({
   downloadTipVisible: false,
   isOkClicked: false,
   fileList: [],
+  uploadProgress: 0,
+  isUploadProgressShow: false,
+  uploadFileName: "",
+  isShare: false,
+  shareCode: "",
 })
 
-function handleOk() {
-  data.isOkClicked = true
-  customRequest()
+async function fileShare(fileId) {
+  console.log(fileId)
+  let res = await shareGenerateApi("", fileId)
+  if (res.code) {
+    message.error(res.msg)
+    return
+  }
+  message.success(res.data)
+  data.isShare = true
+  data.shareCode = res.data
 }
 
-async function customRequest() {
-  if (!data.isOkClicked) {
-    return;
+function shareOk() {
+  data.isShare = false
+}
+
+async function handleOk() {
+  data.isOkClicked = true
+  data.isUploadProgressShow = true
+  if (data.fileList.length > 0) {
+    data.uploadProgress = 0;
+    await uploadFile(data.fileList[0].originFileObj);
   }
-  let file = data.fileList[0].originFileObj; // 获取第一个文件
-  let reader = new FileReader(); // 创建FileReader对象
-  // 读取文件完成后执行回调函数
-  reader.onload = async function () {
-    const arrayBuffer = reader.result; // 获取二进制数据
-    // 将二进制数据上传到服务器
-    const formData = new FormData();
-    // 创建包含二进制数据的Blob对象
-    const blob = new Blob([arrayBuffer], {type: file.type});
-    formData.append('file', blob, file.name);
-    let res = await fileUploadApi(formData);
-    console.log(res)
-    if (res.code === 0) {
-      message.success(res.msg)
-      data.fileList = []
-    }
-  };
-  reader.readAsArrayBuffer(file);
   data.isOkClicked = false
   data.modalVisible = false
+}
+
+async function uploadFile(file) {
+  try {
+    let reader = new FileReader(); // 创建FileReader对象
+    // 读取文件完成后执行回调函数
+    reader.onload = async function () {
+      const arrayBuffer = reader.result; // 获取二进制数据
+      // 将二进制数据上传到服务器
+      const formData = new FormData();
+      // 创建包含二进制数据的Blob对象
+      const blob = new Blob([arrayBuffer], {type: file.type});
+      formData.append('file', blob, file.name);
+      data.uploadFileName = file.name
+      let res = await fileUploadApi(formData, JSON.parse(localStorage.getItem('folderRootId')), {
+        onUploadProgress: (progressEvent) => {
+          data.uploadProgress = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total
+          );
+        },
+      });
+      console.log(res)
+      if (res.code === 0) {
+        message.success(res.msg)
+        data.fileList = []
+        data.uploadProgress = 0;
+        data.uploadFileName = "";
+        data.isUploadProgressShow = false;
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  } catch (error) {
+    message.error(error.message || '上传失败')
+  }
 }
 
 //展开上传文件的窗口
@@ -125,7 +173,7 @@ async function fileDownload(fileIdList) {
     console.log(res)
   } catch (error) {
     console.log(error)
-    message.error("数据协同验证失败，拒绝下载请求")
+    message.error("数据可能被篡改，拒绝下载请求")
   }
 
 }
@@ -133,6 +181,7 @@ async function fileDownload(fileIdList) {
 function fileDelete(fileIdList) {
   console.log(fileIdList)
 }
+
 
 </script>
 

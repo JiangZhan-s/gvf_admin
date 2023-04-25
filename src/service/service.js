@@ -33,7 +33,7 @@ Service.interceptors.response.use(
         if (error.response && error.response.status === 550) {
             // 处理 500 错误响应
             // 在此处可以根据具体的情况采取不同的处理方式
-            message.error("链上连下数据协同验证不统一，下载请求被拒绝")
+            message.error("数据已被篡改，下载请求被拒绝")
         }
         return Promise.reject(error);
     }

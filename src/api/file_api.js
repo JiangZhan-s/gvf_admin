@@ -1,12 +1,13 @@
 import {Service} from "../service/service";
 import axios from "axios";
 
-export function fileUploadApi(data) {
+export function fileUploadApi(data, folderId, config) {
     return Service.post("/api/upload", data, {
         headers: {
             "Content-Type": "multipart/form-data",
-            "id": 1,
-        }
+            "folder_id": folderId,
+        },
+        ...config
     })
 }
 
