@@ -37,11 +37,15 @@
               <span>{{ getFormatDate(record.upload_time) }}</span>
             </template>
             <template v-if="column.key==='action'">
-              <slot name="download" v-bind="{column,record}">
+              <slot name="code" v-bind="{column,record}" v-if="props.isShare">
+                <a-button class="gvf_table_action code" @click="checkShareCode(record.ID)" type="primary">查看分享码
+                </a-button>
+              </slot>
+              <slot name="download" v-bind="{column,record}" v-if="!props.isShare">
                 <a-button class="gvf_table_action download" @click="downloadFile(record.ID)" type="primary">下载
                 </a-button>
               </slot>
-              <slot name="share" v-bind="{column,record}">
+              <slot name="share" v-bind="{column,record}" v-if="!props.isShare">
                 <a-button class="gvf_table_action share" @click="shareFile(record.ID)" type="primary">分享</a-button>
               </slot>
               <a-popconfirm
@@ -49,6 +53,7 @@
                   ok-text="删除"
                   cancel-text="取消"
                   @confirm="fileRemove(record.ID)"
+                  v-if="!props.isShare"
               >
                 <a-button class="gvf_table_action delete" type="danger">删除</a-button>
               </a-popconfirm>
@@ -83,9 +88,12 @@ const props = defineProps({
   },
   baseUrl: {
     type: String,
+  },
+  isShare: {
+    type: Boolean,
   }
 })
-const emits = defineEmits(["delete", "download", "upload", "share"])
+const emits = defineEmits(["delete", "download", "upload", "share", "code"])
 const page = reactive({
   page: 1,
   limit: 5,
@@ -107,6 +115,10 @@ const typeMap = {
 
 function onSelectChange(selectedKeys) {
   data.selectedRowKeys = selectedKeys
+}
+
+function checkShareCode(file_id) {
+  emits("code", [file_id])
 }
 
 function shareFile(file_id) {
@@ -137,19 +149,23 @@ function removeBatch() {
 async function getData() {
   let res = await baseListApi(props.baseUrl, page)
   console.log(res)
+  if (res.code) {
+    message.error(res.msg)
+    return
+  }
   data.list = res.data.list.map(item => ({
     ...item,
     type: typeMap[item.Type]
   }))
   data.count = res.data.count
   data.spinning = false
+  message.success("刷新成功")
 }
 
 function refresh() {
   //全部刷新
   //location.reload()
   //部分刷新
-  message.success("刷新成功")
   getData()
 }
 
@@ -206,6 +222,10 @@ getData()
   }
 
   .gvf_table_action.share {
+    margin-right: 10px;
+  }
+
+  .gvf_table_action.code {
     margin-right: 10px;
   }
 }

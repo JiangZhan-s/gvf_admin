@@ -33,6 +33,8 @@
 <script setup>
 
 import {useRoute, useRouter} from "vue-router";
+import {logoutApi} from "../api/user_api";
+import {message} from "ant-design-vue";
 
 const route = useRoute()
 const router = useRouter()
@@ -44,9 +46,18 @@ const props = defineProps({
   }
 })
 
+async function userLogout() {
+  let res = await logoutApi();
+  message.success(res.msg)
+  await router.push({
+    name: "login",
+  })
+}
+
 function menuClick({key}) {
   if (key === "logout") {
     console.log("logout")
+    userLogout()
     return
   }
   if (key === "login") {

@@ -1,5 +1,5 @@
 <template>
-  <a-modal title="分享码" v-model:visible="data.isShare" @ok="shareOk">
+  <a-modal title="分享码" v-model:visible="data.isCheck" @ok="shareOk">
     <span>{{ data.shareCode }}</span>
   </a-modal>
   <a-modal title="上传文件" v-model:visible="data.modalVisible" @ok="handleOk">
@@ -20,6 +20,7 @@
   <GVFTable @delete="fileDelete" @download="fileDownload" @upload="fileUploadModal" @share="fileShare"
             :columns="data.columns"
             base-url="/api/query_all"
+            :is-share="data.isShare"
   >
   </GVFTable>
   <GVFProgress
@@ -85,6 +86,7 @@ const data = reactive({
   uploadFileName: "",
   isShare: false,
   shareCode: "",
+  isCheck: false,
 })
 
 async function fileShare(fileId) {
@@ -95,12 +97,12 @@ async function fileShare(fileId) {
     return
   }
   message.success(res.data)
-  data.isShare = true
+  data.isCheck = true
   data.shareCode = res.data
 }
 
 function shareOk() {
-  data.isShare = false
+  data.isCheck = false
 }
 
 async function handleOk() {

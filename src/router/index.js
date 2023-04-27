@@ -48,6 +48,11 @@ const router = createRouter({
                     name: "file_picture",
                     component: () => import("../views/admin/file_mgr/file_classify/file_picture.vue")
                 },
+                {
+                    path: "shares",
+                    name: "shares",
+                    component: () => import("../views/admin/file_mgr/share_list.vue")
+                }
             ]
         },
     ]

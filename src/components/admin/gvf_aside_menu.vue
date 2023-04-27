@@ -87,6 +87,13 @@ const data = reactive({
           children: []
         },
       ]
+    },
+    {
+      id: 8,
+      icon: "fa fa-slideshare",
+      title: "我的分享",
+      name: "shares",
+      children: []
     }
   ]
 })

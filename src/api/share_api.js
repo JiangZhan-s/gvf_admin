@@ -9,3 +9,12 @@ export function shareGenerateApi(data, folderId) {
         },
     })
 }
+
+export function queryShareCodeByIdApi(folderId) {
+    return Service.get("/api/query_share_by_id", {
+        headers: {
+            "Content-Type": "application/json",
+            "folder_id": folderId,
+        },
+    })
+}

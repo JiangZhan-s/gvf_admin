@@ -1,0 +1,88 @@
+<template>
+  <a-modal title="分享码" v-model:visible="data.isCheck" @ok="shareOk">
+    <span>分享码是:{{ data.shareCode }}</span>
+  </a-modal>
+  <GVFTable @code="codeCheck"
+            :columns="data.columns"
+            base-url="/api/query_share_all"
+            :is-share="data.isShare"
+  >
+  </GVFTable>
+</template>
+
+<script setup>
+import GVFTable from "../../../components/admin/gvf_table.vue"
+import {reactive} from "vue";
+import {queryShareCodeByIdApi} from "../../../api/share_api";
+import {message} from "ant-design-vue";
+
+const data = reactive({
+  columns: [
+    {
+      title: '名称',
+      dataIndex: 'file_name',
+      key: 'file_name',
+    },
+    {
+      title: '类型',
+      dataIndex: 'type',
+      key: 'type',
+    },
+    {
+      title: '后缀',
+      dataIndex: 'postfix',
+      key: 'postfix',
+    },
+    {
+      title: '大小',
+      dataIndex: 'size_str',
+      key: 'size_str',
+    },
+    {
+      title: '下载次数',
+      dataIndex: 'download_num',
+      key: 'download_num',
+    },
+    {
+      title: '上传时间 ',
+      dataIndex: 'upload_time',
+      key: 'upload_time',
+    },
+    {
+      title: '操作 ',
+      dataIndex: 'action',
+      key: 'action',
+    },
+  ],
+  modalVisible: false,
+  downloadTipVisible: false,
+  isOkClicked: false,
+  fileList: [],
+  uploadProgress: 0,
+  isUploadProgressShow: false,
+  uploadFileName: "",
+  isShare: true,
+  shareCode: "",
+  isCheck: false,
+})
+
+function shareOk() {
+  data.isCheck = false
+}
+
+async function codeCheck(fileId) {
+
+  let res = await queryShareCodeByIdApi(fileId)
+  if (res.code) {
+    message.error("请重试")
+  }
+  data.shareCode = res.data
+  data.isCheck = true
+
+}
+
+</script>
+
+<style>
+
+</style>

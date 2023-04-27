@@ -5,3 +5,9 @@ export function emailLoginApi(data) {
         headers: {}
     })
 }
+
+export function logoutApi() {
+    return Service.post("/api/logout", "", {
+        headers: {}
+    })
+}
