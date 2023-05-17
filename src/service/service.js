@@ -11,14 +11,18 @@ export const Service = axios.create({
 
 // 添加请求拦截器
 Service.interceptors.request.use(request => {
-    // 获取本地存储的token
-    const token = JSON.parse(localStorage.getItem('userInfo')).token;
-    // 在header中添加Authorization字段
-    if (token) {
-        request.headers['token'] = token
+    // 检查本地存储是否有用户信息
+    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    if (userInfo && userInfo.token) {
+        // 获取本地存储的token
+        // 在header中添加Authorization字段
+        request.headers['token'] = userInfo.token;
     }
-    return request
-})
+    return request;
+}, error => {
+    return Promise.reject(error);
+});
+
 
 Service.interceptors.response.use(
     (response) => {

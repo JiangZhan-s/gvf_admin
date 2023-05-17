@@ -1,10 +1,14 @@
 <template>
   <a-modal title="分享码" v-model:visible="data.isCheck" @ok="shareOk">
-    <span>分享码是:{{ data.shareCode }}</span>
+    <span>
+      查询码: {{ data.shareHash }}
+      <br/>
+      提取码: {{ data.shareCode }}
+    </span>
   </a-modal>
   <GVFTable @code="codeCheck"
             :columns="data.columns"
-            base-url="/api/query_share_all"
+            base-file-url="/api/query_share_all"
             :is-share="data.isShare"
   >
   </GVFTable>
@@ -13,7 +17,7 @@
 <script setup>
 import GVFTable from "../../../components/admin/gvf_table.vue"
 import {reactive} from "vue";
-import {queryShareCodeByIdApi} from "../../../api/share_api";
+import {queryShareCodeByIdApi, getCodeByIdApi} from "../../../api/share_api";
 import {message} from "ant-design-vue";
 
 const data = reactive({
@@ -62,6 +66,7 @@ const data = reactive({
   isUploadProgressShow: false,
   uploadFileName: "",
   isShare: true,
+  shareHash: "",
   shareCode: "",
   isCheck: false,
 })
@@ -76,6 +81,9 @@ async function codeCheck(fileId) {
   if (res.code) {
     message.error("请重试")
   }
+  data.shareHash = res.data
+  res = await getCodeByIdApi(fileId)
+  console.log(res)
   data.shareCode = res.data
   data.isCheck = true
 

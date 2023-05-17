@@ -6,8 +6,9 @@
         <div class="left">
           <a-breadcrumb>
             <a-breadcrumb-item>首页</a-breadcrumb-item>
-            <a-breadcrumb-item><a href="#">个人中心</a></a-breadcrumb-item>
-            <a-breadcrumb-item><a href="#">用户列表</a></a-breadcrumb-item>
+            <!--            <template v-for="item in items" :key="item">-->
+            <!--              <a-breadcrumb-item><a :href="valueToLabel[item]?.href">{{ valueToLabel[item]?.label }}</a></a-breadcrumb-item>-->
+            <!--            </template>-->
           </a-breadcrumb>
         </div>
         <div class="right">
@@ -22,7 +23,11 @@
       <div class="tabs"></div>
       <main>
         <div class="gvf_view">
-          <router-view/>
+          <router-view v-slot="{Component}">
+            <transition name="fade">
+              <component :is="Component"></component>
+            </transition>
+          </router-view>
         </div>
       </main>
     </div>
@@ -35,7 +40,6 @@ import GVFTheme from "../../components/gvf_theme.vue"
 import GVFAside from "../../components/admin/gvf_aside.vue"
 import GVFFullScreen from "../../components/gvf_full_screen.vue"
 import GVFUserInfo from "../../components/gvf_user_info.vue"
-
 </script>
 
 <style lang="scss">
@@ -104,4 +108,27 @@ import GVFUserInfo from "../../components/gvf_user_info.vue"
     }
   }
 }
+</style>
+
+<style>
+
+.fade-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.fade-enter-active {
+  transform: translateX(-30px);
+  opacity: 0;
+}
+
+.fade-enter-to {
+  transform: translateX(0px);
+  opacity: 1;
+}
+
+.fade-leave-active .fade-enter-active {
+  transition: all 0.3s ease-out;
+}
+
 </style>

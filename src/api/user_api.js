@@ -11,3 +11,12 @@ export function logoutApi() {
         headers: {}
     })
 }
+
+export function getNicknameById(userId) {
+    return Service.get("/api/get_nickname_by_id", {
+        headers: {
+            "Content-Type": "application/json",
+            "user_id": userId
+        }
+    })
+}

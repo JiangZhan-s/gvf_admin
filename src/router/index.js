@@ -1,4 +1,5 @@
 import {createRouter, createWebHistory} from 'vue-router'
+import {reactive, watch} from "vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -52,10 +53,17 @@ const router = createRouter({
                     path: "shares",
                     name: "shares",
                     component: () => import("../views/admin/file_mgr/share_list.vue")
+                },
+                {
+                    path: "share_file",
+                    name: "share_file",
+                    component: () => import("../views/admin/share_file.vue")
                 }
             ]
         },
     ]
 })
 
+
 export default router
+

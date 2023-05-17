@@ -11,13 +11,16 @@
     </div>
     <div class="gvf_actions">
       <slot name="upload">
-        <a-button type="primary" @click="uploadModal">上传</a-button>
+        <a-button type="primary" @click="uploadModal" v-if="!props.isShare">上传</a-button>
       </slot>
       <slot name="batchDownload">
-        <a-button type="primary" @click="downloadBatch">批量下载</a-button>
+        <a-button type="primary" @click="downloadBatch" v-if="!props.isShare">批量下载</a-button>
       </slot>
       <slot name="batchRemove">
         <a-button type="danger" v-if="data.selectedRowKeys.length" @click="removeBatch">批量删除</a-button>
+      </slot>
+      <slot name="folderAdd">
+        <a-button type="primary" @click="folderAddModal" v-if="!props.isShare">新建文件夹</a-button>
       </slot>
 
     </div>
@@ -33,6 +36,7 @@
             :row-key="'ID'"
             :data-source="data.list">
           <template #bodyCell="{column,record}">
+            <template v-if="column.key==='file_name'"></template>
             <template v-if="column.key==='upload_time'">
               <span>{{ getFormatDate(record.upload_time) }}</span>
             </template>
@@ -77,23 +81,28 @@
 
 <script setup>
 import {reactive} from "vue";
+import {useStore} from "@/stores/store";
 import {getFormatDate} from "../../utils/date";
 import {message} from "ant-design-vue";
 import {baseListApi} from "../../api/base_api";
 
+const store = useStore()
 
 const props = defineProps({
   columns: {
     type: Array
   },
-  baseUrl: {
+  baseFileUrl: {
+    type: String,
+  },
+  baseFolderUrl: {
     type: String,
   },
   isShare: {
     type: Boolean,
   }
 })
-const emits = defineEmits(["delete", "download", "upload", "share", "code"])
+const emits = defineEmits(["delete", "download", "upload", "share", "code", "folder_add"])
 const page = reactive({
   page: 1,
   limit: 5,
@@ -107,8 +116,8 @@ const data = reactive({
 const typeMap = {
   1: '文档',
   2: '图片',
-  3: '视频',
-  4: '音乐',
+  3: '音乐',
+  4: '视频',
   5: '其他',
 }
 
@@ -129,6 +138,10 @@ function uploadModal() {
   emits("upload")
 }
 
+function folderAddModal() {
+  emits("folder_add")
+}
+
 function downloadFile(file_id) {
   emits("download", [file_id])
 }
@@ -147,7 +160,10 @@ function removeBatch() {
 }
 
 async function getData() {
-  let res = await baseListApi(props.baseUrl, page)
+  let res = await baseListApi(props.baseFileUrl, page, {
+    'Content-Type': 'application/json', // 设置请求数据格式
+    'parent_folder_id': JSON.parse(localStorage.getItem('folderRootId')),
+  })
   console.log(res)
   if (res.code) {
     message.error(res.msg)
@@ -159,13 +175,13 @@ async function getData() {
   }))
   data.count = res.data.count
   data.spinning = false
-  message.success("刷新成功")
 }
 
 function refresh() {
   //全部刷新
   //location.reload()
   //部分刷新
+  message.success("刷新成功")
   getData()
 }
 
@@ -174,6 +190,10 @@ function pageChange(page, limit) {
 }
 
 getData()
+
+defineExpose({
+  refresh,
+})
 
 </script>
 

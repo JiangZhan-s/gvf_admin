@@ -11,6 +11,16 @@ export function fileUploadApi(data, folderId, config) {
     })
 }
 
+export function fileBatchUploadApi(data, folderId, config) {
+    return Service.post("/api/upload_multi", data, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+            "folder_id": folderId,
+        },
+        ...config
+    })
+}
+
 export function fileListApi(params) {
     return Service.get("/api/query_all", {params})
 }
@@ -24,3 +34,12 @@ export function fileDownloadApi(fileId) {
         }
     })
 }
+
+export function fileDetailApi() {
+    return Service.get("/api/query_detail_use", {
+        headers: {
+            "Content-Type": "application/json",
+        }
+    })
+}
+

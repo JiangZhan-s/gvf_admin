@@ -94,6 +94,13 @@ const data = reactive({
       title: "我的分享",
       name: "shares",
       children: []
+    },
+    {
+      id: 8,
+      icon: "fa fa-link",
+      title: "提取文件",
+      name: "share_file",
+      children: []
     }
   ]
 })
