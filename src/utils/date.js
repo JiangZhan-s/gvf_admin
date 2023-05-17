@@ -15,5 +15,3 @@ export function getFormatDate(dateStr) {
         + " " + hour + ":" + minutes + ":" + seconds;
     return currentDate;
 }
-
-console.log(getFormatDate())

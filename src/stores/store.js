@@ -12,6 +12,7 @@ export const useStore = defineStore('gvf', {
                 exp: 0
             },
             userFolderRoot: -1,
+            tabList: []
         }
     },
     actions: {
@@ -76,5 +77,42 @@ export const useStore = defineStore('gvf', {
             }
             this.setFolderRoot(folderRootId)
         },
+
+        //添加 tab
+        addTab(tab) {
+            //已经存在就不添加了
+            //不存在的时候添加
+            if (this.tabList.findIndex((item) => item.name === tab.name) === -1) {
+                this.tabList.push({
+                    name: tab.name,
+                    title: tab.title
+                })
+            }
+        },
+        saveTab() {
+            localStorage.setItem("tabs", JSON.stringify(this.tabList))
+        },
+        loadTab() {
+            let tabs = localStorage.getItem("tabs")
+            if (tabs === null) {
+                this.tabList = [{
+                    title: "首页",
+                    name: "home",
+                }]
+                return
+            }
+            this.tabList = JSON.parse(tabs)
+        },
+        removeTab(tab) {
+            let index = this.tabList.findIndex((item) => item.name === tab.name)
+            this.tabList.splice(index, 1)
+            return index
+        },
+        removeTabAll() {
+            this.tabList = [{
+                title: "首页",
+                name: "home",
+            }]
+        }
     }
 })

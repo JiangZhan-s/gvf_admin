@@ -20,13 +20,11 @@
           <GVFUserInfo :is-avatar="true"></GVFUserInfo>
         </div>
       </header>
-      <div class="tabs"></div>
+      <GVFTabs></GVFTabs>
       <main>
         <div class="gvf_view">
-          <router-view v-slot="{Component}">
-            <transition name="fade">
-              <component :is="Component"></component>
-            </transition>
+          <router-view v-slot="{ Component }">
+            <component :is="Component"></component>
           </router-view>
         </div>
       </main>
@@ -40,6 +38,7 @@ import GVFTheme from "../../components/gvf_theme.vue"
 import GVFAside from "../../components/admin/gvf_aside.vue"
 import GVFFullScreen from "../../components/gvf_full_screen.vue"
 import GVFUserInfo from "../../components/gvf_user_info.vue"
+import GVFTabs from "../../components/admin/gvf_tabs.vue"
 </script>
 
 <style lang="scss">
@@ -95,40 +94,9 @@ import GVFUserInfo from "../../components/gvf_user_info.vue"
       }
     }
 
-    .tabs {
-      height: 30px;
-      border-color: var(--order);
-      border-style: solid;
-      border-width: 1px 0 1px 0;
-      background-color: var(--card_bg);
-    }
-
     main {
       padding: 20px;
     }
   }
 }
-</style>
-
-<style>
-
-.fade-leave-to {
-  opacity: 0;
-  transform: translateX(30px);
-}
-
-.fade-enter-active {
-  transform: translateX(-30px);
-  opacity: 0;
-}
-
-.fade-enter-to {
-  transform: translateX(0px);
-  opacity: 1;
-}
-
-.fade-leave-active .fade-enter-active {
-  transition: all 0.3s ease-out;
-}
-
 </style>

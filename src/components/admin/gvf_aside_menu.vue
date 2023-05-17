@@ -6,19 +6,19 @@
       @click="goto"
   >
     <template v-for="menu in data.menuList" :key="menu.name">
-      <a-menu-item :key="menu.name" v-if="menu.children.length===0">
+      <a-menu-item :key="menu" v-if="menu.children.length===0">
         <template #icon>
           <i :class="'fa '+menu.icon"></i>
         </template>
         <span>{{ menu.title }}</span>
       </a-menu-item>
 
-      <a-sub-menu :key="menu.name" v-else>
+      <a-sub-menu :key="menu.id" v-else>
         <template #icon>
           <i :class="'fa '+menu.icon"></i>
         </template>
         <template #title>{{ menu.title }}</template>
-        <a-menu-item v-for="sub_menu in menu.children" :key="sub_menu.name">
+        <a-menu-item v-for="sub_menu in menu.children" :key="sub_menu">
           <template #icon>
             <i :class="'fa '+sub_menu.icon"></i>
           </template>
@@ -34,7 +34,9 @@
 <script setup>
 import {reactive, ref} from "vue";
 import {useRouter} from "vue-router"
+import {useStore} from "@/stores/store";
 
+const store = useStore()
 const selectedKeys = ref(["1"])
 const data = reactive({
   menuList: [
@@ -53,34 +55,33 @@ const data = reactive({
       children: []
     },
     {
-      id: 3,
       icon: "fa-folder-open",//图标统一用fa
       title: "我的文件",//菜单名称
       name: "files",//路由名称
       children: []
     },
     {
-      id: 4,
+      id: 3,
       icon: "fa-th-large",//图标统一用fa
       title: "文件格式",//菜单名称
       name: "",//路由名称
       children: [
         {
-          id: 5,
+          id: 4,
           icon: "fa-file-text-o",//图标统一用fa
           title: "文档",//菜单名称
           name: "file_text",//路由名称
           children: []
         },
         {
-          id: 6,
+          id: 5,
           icon: "fa-file-movie-o",//图标统一用fa
           title: "影音",//菜单名称
           name: "file_movie",//路由名称
           children: []
         },
         {
-          id: 7,
+          id: 6,
           icon: "fa-file-picture-o",//图标统一用fa
           title: "图片",//菜单名称
           name: "file_picture",//路由名称
@@ -89,7 +90,7 @@ const data = reactive({
       ]
     },
     {
-      id: 8,
+      id: 7,
       icon: "fa fa-slideshare",
       title: "我的分享",
       name: "shares",
@@ -106,9 +107,15 @@ const data = reactive({
 })
 const router = useRouter()
 
-function goto(event) {
+function goto(item) {
+  store.addTab({
+    name: item.key.name,
+    title: item.key.title
+  })
+  console.log(item)
+  //加入到 tabs
   router.push({
-    name: event.key,
+    name: item.key.name,
   })
 }
 
