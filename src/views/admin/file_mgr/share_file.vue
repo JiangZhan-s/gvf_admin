@@ -49,13 +49,13 @@
 
 <script setup>
 
-import {getFormatDate} from "../../utils/date"
-import {getNicknameById} from "../../api/user_api"
-import {getShareInfoByHashApi, getShareFileInfoByCodeApi} from "../../api/share_api"
+import {getFormatDate} from "../../../utils/date"
+import {getNicknameById} from "../../../api/user_api"
+import {getShareInfoByHashApi, getShareFileInfoByCodeApi} from "../../../api/share_api"
 import {message} from "ant-design-vue";
 import {reactive} from "vue";
 import {saveAs} from "file-saver"
-import {fileDownloadApi} from "../../api/file_api";
+import {fileDownloadApi} from "../../../api/file_api";
 
 const typeMap = {
   1: '文档',

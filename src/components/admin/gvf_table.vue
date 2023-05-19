@@ -10,17 +10,20 @@
       </div>
     </div>
     <div class="gvf_actions">
+      <slot name="userAdd">
+        <a-button type="primary" @click="userAddModal" v-if="props.isUser||props.isRole">添加</a-button>
+      </slot>
       <slot name="upload">
-        <a-button type="primary" @click="uploadModal" v-if="!props.isShare">上传</a-button>
+        <a-button type="primary" @click="uploadModal" v-if="props.isFile">上传</a-button>
       </slot>
       <slot name="batchDownload">
-        <a-button type="primary" @click="downloadBatch" v-if="!props.isShare">批量下载</a-button>
+        <a-button type="primary" @click="downloadBatch" v-if="props.isFile">批量下载</a-button>
       </slot>
       <slot name="batchRemove">
         <a-button type="danger" v-if="data.selectedRowKeys.length" @click="removeBatch">批量删除</a-button>
       </slot>
       <slot name="folderAdd">
-        <a-button type="primary" @click="folderAddModal" v-if="!props.isShare">新建文件夹</a-button>
+        <a-button type="primary" @click="folderAddModal" v-if="props.isFile">新建文件夹</a-button>
       </slot>
 
     </div>
@@ -40,24 +43,33 @@
             <template v-if="column.key==='upload_time'">
               <span>{{ getFormatDate(record.upload_time) }}</span>
             </template>
+            <template v-if="column.key==='CreatedAt'">
+              <span>{{ getFormatDate(record.CreatedAt) }}</span>
+            </template>
+            <template v-if="column.key==='UpdatedAt'">
+              <span>{{ getFormatDate(record.UpdatedAt) }}</span>
+            </template>
             <template v-if="column.key==='action'">
               <slot name="code" v-bind="{column,record}" v-if="props.isShare">
                 <a-button class="gvf_table_action code" @click="checkShareCode(record.ID)" type="primary">查看分享码
                 </a-button>
               </slot>
-              <slot name="download" v-bind="{column,record}" v-if="!props.isShare">
+              <slot name="download" v-bind="{column,record}" v-if="props.isFile||props.isFolder">
                 <a-button class="gvf_table_action download" @click="downloadFile(record.ID)" type="primary">下载
                 </a-button>
               </slot>
-              <slot name="share" v-bind="{column,record}" v-if="!props.isShare">
+              <slot name="share" v-bind="{column,record}" v-if="props.isFile||props.isFolder">
                 <a-button class="gvf_table_action share" @click="shareFile(record.ID)" type="primary">分享</a-button>
+              </slot>
+              <slot name="edit" v-bind="{column,record}" v-if="props.isUser||props.isRole">
+                <a-button class="gvf_table_action share" @click="edit(record.ID)" type="primary">修改</a-button>
               </slot>
               <a-popconfirm
                   title="是否确定删除？"
                   ok-text="删除"
                   cancel-text="取消"
-                  @confirm="fileRemove(record.ID)"
-                  v-if="!props.isShare"
+                  @confirm="remove(record.ID)"
+                  v-if="props.isFile||props.isFolder||props.isUser||props.isRole"
               >
                 <a-button class="gvf_table_action delete" type="danger">删除</a-button>
               </a-popconfirm>
@@ -67,13 +79,13 @@
       </a-spin>
     </div>
     <div class="gvf_pages">
-      <a-pagination
-          :showSizeChanger="false"
-          v-model:current="page.page"
-          v-model:page-size="page.limit"
-          @change="pageChange"
-          :total=data.count
-          :show-total="total => `共 ${total} 条`"
+      <a-pagination v-if="props.isFile||props.isShare"
+                    :showSizeChanger="false"
+                    v-model:current="page.page"
+                    v-model:page-size="page.limit"
+                    @change="pageChange"
+                    :total=data.count
+                    :show-total="total => `共 ${total} 条`"
       />
     </div>
   </div>
@@ -100,9 +112,22 @@ const props = defineProps({
   },
   isShare: {
     type: Boolean,
+  },
+  isFile: {
+    type: Boolean,
+  },
+  isFolder: {
+    type: Boolean,
+  },
+  isUser: {
+    type: Boolean,
+  },
+  isRole: {
+    type: Boolean,
   }
 })
-const emits = defineEmits(["delete", "download", "upload", "share", "code", "folder_add"])
+const emits = defineEmits(["delete", "download", "upload", "share",
+  "code", "folder_add", "user_add", "edit"])
 const page = reactive({
   page: 1,
   limit: 5,
@@ -124,6 +149,14 @@ const typeMap = {
 
 function onSelectChange(selectedKeys) {
   data.selectedRowKeys = selectedKeys
+}
+
+function edit(id) {
+  emits("edit", [id])
+}
+
+function userAddModal() {
+  emits("user_add")
 }
 
 function checkShareCode(file_id) {
@@ -150,9 +183,9 @@ function downloadBatch() {
   emits("download", data.selectedRowKeys)
 }
 
-//删除单个文件
-function fileRemove(file_id) {
-  emits("delete", [file_id])
+//删除单个
+function remove(id) {
+  emits("delete", [id])
 }
 
 function removeBatch() {

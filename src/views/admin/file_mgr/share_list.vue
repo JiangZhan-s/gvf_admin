@@ -10,6 +10,10 @@
             :columns="data.columns"
             base-file-url="/api/query_share_all"
             :is-share="data.isShare"
+            :is-folder="data.isFolder"
+            :is-file="data.isFile"
+            :is-user="data.isUser"
+            :is-role="data.isRole"
   >
   </GVFTable>
 </template>
@@ -65,7 +69,13 @@ const data = reactive({
   uploadProgress: 0,
   isUploadProgressShow: false,
   uploadFileName: "",
+
   isShare: true,
+  isFile: false,
+  isFolder: false,
+  isUser: false,
+  isRole: false,
+
   shareHash: "",
   shareCode: "",
   isCheck: false,

@@ -18,10 +18,6 @@
             <a-button type="primary" @click="emailLogin">登录</a-button>
           </div>
         </div>
-        <div class="gvf_login_other">第三方登录</div>
-        <div class="gvf_login_other_icons">
-          <img src="../assets/icon/QQ.png" class="gvf_login_other_icon" alt="">
-        </div>
       </div>
     </div>
   </div>
@@ -70,6 +66,14 @@ async function emailLogin() {
     return
   }
   store.setFolderRoot(res.data)
+
+  if (userInfo.role === 1) {
+    setTimeout(() => {
+      router.push({name: "users"})
+    }, 1000)
+    return
+  }
+
   const redirect_url = route.query.redirect_url
   if (redirect_url === undefined) {
     setTimeout(() => {
@@ -81,8 +85,6 @@ async function emailLogin() {
   setTimeout(() => {
     router.push({path: redirect_url})
   }, 1000)
-
-  return
 }
 
 </script>

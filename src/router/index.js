@@ -57,7 +57,22 @@ const router = createRouter({
                 {
                     path: "share_file",
                     name: "share_file",
-                    component: () => import("../views/admin/share_file.vue")
+                    component: () => import("../views/admin/file_mgr/share_file.vue")
+                },
+                {
+                    path: "folder_file",
+                    name: "folder_file",
+                    component: () => import("../views/admin/file_mgr/file_folder.vue")
+                },
+                {
+                    path: "users",
+                    name: "users",
+                    component: () => import("../views/admin/user/user.vue")
+                },
+                {
+                    path: "roles",
+                    name: "roles",
+                    component: () => import("../views/admin/user/role.vue")
                 }
             ]
         },

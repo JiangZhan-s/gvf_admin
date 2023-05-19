@@ -53,6 +53,10 @@
       :columns="data.columns"
       base-file-url="/api/query_all"
       :is-share="data.isShare"
+      :is-file="data.isFile"
+      :is-folder="data.isFolder"
+      :is-user="data.isUser"
+      :is-role="data.isRole"
       ref="gvfTable"
   >
   </GVFTable>
@@ -74,11 +78,6 @@ import {folderAddApi} from "../../../api/folder_api"
 import {saveAs} from "file-saver"
 import {message} from "ant-design-vue";
 import {shareGenerateApi} from "../../../api/share_api";
-
-function test(...params) {
-  params[0].onSuccess()
-  console.log(params)
-}
 
 const store = useStore()
 
@@ -127,7 +126,13 @@ const data = reactive({
   uploadProgress: 0,
   isUploadProgressShow: false,
   uploadFileName: "",
+
   isShare: false,
+  isFile: true,
+  isFolder: false,
+  isUser: false,
+  isRole: false,
+
   shareCode: "",
   isCheck: false,
   folderVisible: false,
