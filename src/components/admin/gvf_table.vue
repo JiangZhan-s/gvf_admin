@@ -2,7 +2,7 @@
   <div class="gvf_container">
     <div class="gvf_search">
       <a-input-search
-          placeholder="搜索文件名称"
+          placeholder="搜索名称"
           style="width: 200px"
       />
       <div class="gvf_refresh">
@@ -28,7 +28,7 @@
 
     </div>
     <div class="gvf_tables">
-      <a-spin :spinning=data.spinning tip="加载中..." :delay="300">
+      <a-spin :spinning=data.spinning tip="加载中..." :delay="300" :scroll="{ x: 0, y: 300 }">
         <a-table
             :columns="props.columns"
             :row-selection="{
@@ -48,6 +48,9 @@
             </template>
             <template v-if="column.key==='UpdatedAt'">
               <span>{{ getFormatDate(record.UpdatedAt) }}</span>
+            </template>
+            <template v-if="column.key==='token'">
+              <span style="width: 400px; display: inline-block">{{ record.token }}</span>
             </template>
             <template v-if="column.key==='action'">
               <slot name="code" v-bind="{column,record}" v-if="props.isShare">
@@ -79,7 +82,7 @@
       </a-spin>
     </div>
     <div class="gvf_pages">
-      <a-pagination v-if="props.isFile||props.isShare"
+      <a-pagination v-if="props.isFile||props.isShare||props.isLoginData"
                     :showSizeChanger="false"
                     v-model:current="page.page"
                     v-model:page-size="page.limit"
@@ -123,6 +126,9 @@ const props = defineProps({
     type: Boolean,
   },
   isRole: {
+    type: Boolean,
+  },
+  isLoginData: {
     type: Boolean,
   }
 })

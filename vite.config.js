@@ -21,6 +21,16 @@ export default ({mode}) => {
                 },
                 "/api": {
                     target: baseUrl
+                },
+                "/ip": {
+                    target: "https://api.ipify.org?format=json",
+                    changeOrigin: true,
+                    rewrite: (path) => path.replace(/^\/api/, '')
+                },
+                "/city": {
+                    target: "http://ip-api.com/json/",
+                    changeOrigin: true,
+                    rewrite: (path) => path.replace(/^\/city/, '')
                 }
             }
         }

@@ -136,7 +136,7 @@ const data = reactive({
           id: 14,
           icon: "fa fa-clock-o",
           title: "登录信息",
-          name: "share_file",
+          name: "login_data",
           children: []
         },
         {

@@ -73,6 +73,11 @@ const router = createRouter({
                     path: "roles",
                     name: "roles",
                     component: () => import("../views/admin/user/role.vue")
+                },
+                {
+                    path: "login_data",
+                    name: "login_data",
+                    component: () => import("../views/admin/user/login_data.vue")
                 }
             ]
         },

@@ -27,7 +27,7 @@
 
 import {reactive} from "vue";
 import {message} from 'ant-design-vue';
-import {emailLoginApi} from "../api/user_api";
+import {emailLoginApi, getUserIPApi, getCityFromIP} from "../api/user_api";
 import {parseToken} from "../utils/jwt";
 import {useStore} from "@/stores/store";
 import {useRoute, useRouter} from "vue-router";
@@ -39,7 +39,18 @@ const store = useStore()
 const data = reactive({
   user_name: "",
   password: "",
+  ip: "",
+  city: "",
 })
+
+async function getUserIP() {
+  let res = await getUserIPApi()
+  data.ip = res
+  res = await getCityFromIP(data.ip)
+  data.city = res
+  console.log(res)
+}
+
 
 async function emailLogin() {
   if (data.user_name.trim() === "") {
@@ -50,6 +61,8 @@ async function emailLogin() {
     message.error("请输入密码")
     return
   }
+
+  await getUserIP()
   let res = await emailLoginApi(data)
   if (res.code) {
     message.error(res.msg)
@@ -65,6 +78,7 @@ async function emailLogin() {
     message.error(res.msg)
     return
   }
+  console.log(res.data)
   store.setFolderRoot(res.data)
 
   if (userInfo.role === 1) {
