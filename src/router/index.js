@@ -1,5 +1,4 @@
 import {createRouter, createWebHistory} from 'vue-router'
-import {reactive, watch} from "vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -78,6 +77,11 @@ const router = createRouter({
                     path: "login_data",
                     name: "login_data",
                     component: () => import("../views/admin/user/login_data.vue")
+                },
+                {
+                    path: "fabric",
+                    name: "fabric",
+                    component: () => import("../views/admin/fabric/fabric.vue")
                 }
             ]
         },

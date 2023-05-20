@@ -1,9 +1,9 @@
 <template>
   <a-modal title="分享码" v-model:visible="data.isCheck" @ok="shareOk">
     <span>
-      查询码: {{ data.shareHash }}
+      提取码: {{ data.shareHash }}
       <br/>
-      提取码: {{ data.shareCode }}
+      查询码: {{ data.shareCode }}
     </span>
   </a-modal>
   <GVFTable @code="codeCheck"
@@ -14,6 +14,8 @@
             :is-file="data.isFile"
             :is-user="data.isUser"
             :is-role="data.isRole"
+            :is-setting="data.isSetting"
+            :is-fabric="data.isFabric"
   >
   </GVFTable>
 </template>
@@ -75,6 +77,8 @@ const data = reactive({
   isFolder: false,
   isUser: false,
   isRole: false,
+  isSetting: false,
+  isFabric: false,
 
   shareHash: "",
   shareCode: "",

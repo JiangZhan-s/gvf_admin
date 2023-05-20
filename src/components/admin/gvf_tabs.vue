@@ -20,6 +20,8 @@
 
 import {useStore} from "@/stores/store";
 import {useRoute, useRouter} from "vue-router";
+import {folderRootFindApi} from "../../api/folder_api";
+import {message} from "ant-design-vue";
 
 const store = useStore()
 const route = useRoute()
@@ -34,8 +36,17 @@ function isActive(item) {
   return "gvf_tab_item"
 }
 
-function checkTab(item) {
-  router.push({
+async function checkTab(item) {
+  let res = await folderRootFindApi()
+  if (res.code) {
+    message.error(res.msg)
+    return
+  }
+  console.log(res.data)
+  store.setFolderRoot(res.data)
+
+
+  await router.push({
     name: item.name
   })
 }

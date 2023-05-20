@@ -46,6 +46,9 @@
             <template v-if="column.key==='CreatedAt'">
               <span>{{ getFormatDate(record.CreatedAt) }}</span>
             </template>
+            <template v-if="column.key==='Timestamp'">
+              <span>{{ getFormatDate(record.Timestamp) }}</span>
+            </template>
             <template v-if="column.key==='UpdatedAt'">
               <span>{{ getFormatDate(record.UpdatedAt) }}</span>
             </template>
@@ -57,11 +60,11 @@
                 <a-button class="gvf_table_action code" @click="checkShareCode(record.ID)" type="primary">查看分享码
                 </a-button>
               </slot>
-              <slot name="download" v-bind="{column,record}" v-if="props.isFile||props.isFolder">
+              <slot name="download" v-bind="{column,record}" v-if="props.isFile||(props.isFolder&&record.is_file)">
                 <a-button class="gvf_table_action download" @click="downloadFile(record.ID)" type="primary">下载
                 </a-button>
               </slot>
-              <slot name="share" v-bind="{column,record}" v-if="props.isFile||props.isFolder">
+              <slot name="share" v-bind="{column,record}" v-if="props.isFile||(props.isFolder&&record.is_file)">
                 <a-button class="gvf_table_action share" @click="shareFile(record.ID)" type="primary">分享</a-button>
               </slot>
               <slot name="edit" v-bind="{column,record}" v-if="props.isUser||props.isRole">
@@ -77,12 +80,25 @@
                 <a-button class="gvf_table_action delete" type="danger">删除</a-button>
               </a-popconfirm>
             </template>
+            <template v-if="column.key==='name'&&!record.is_file">
+              <i class="fa fa-folder-o" style="margin-right: 10px;color: blue"></i>
+              <a href="javascript:void(0)" @click="changeFolder(record.id)" style="font-weight: 800">{{
+                  record.name
+                }}</a>
+            </template>
+            <template v-if="column.key==='name'&&record.is_file">
+              <i class="fa fa-file-o" style="margin-right: 10px;color: green"></i>
+              <span style="font-weight: 500">{{ record.name }}</span>
+            </template>
+            <template v-if="column.key==='update_time'">
+              <span>{{ getFormatDate(record.update_time) }}</span>
+            </template>
           </template>
         </a-table>
       </a-spin>
     </div>
     <div class="gvf_pages">
-      <a-pagination v-if="props.isFile||props.isShare||props.isLoginData"
+      <a-pagination v-if="(props.isFile||props.isShare||props.isSetting)&&!props.isFabric"
                     :showSizeChanger="false"
                     v-model:current="page.page"
                     v-model:page-size="page.limit"
@@ -100,6 +116,7 @@ import {useStore} from "@/stores/store";
 import {getFormatDate} from "../../utils/date";
 import {message} from "ant-design-vue";
 import {baseListApi} from "../../api/base_api";
+import {fileWithFolderApi} from "../../api/file_api"
 
 const store = useStore()
 
@@ -128,12 +145,15 @@ const props = defineProps({
   isRole: {
     type: Boolean,
   },
-  isLoginData: {
+  isSetting: {
+    type: Boolean,
+  },
+  isFabric: {
     type: Boolean,
   }
 })
 const emits = defineEmits(["delete", "download", "upload", "share",
-  "code", "folder_add", "user_add", "edit"])
+  "code", "folder_add", "user_add", "edit", "folder_change"])
 const page = reactive({
   page: 1,
   limit: 5,
@@ -155,6 +175,10 @@ const typeMap = {
 
 function onSelectChange(selectedKeys) {
   data.selectedRowKeys = selectedKeys
+}
+
+function changeFolder(folderId) {
+  emits("folder_change", [folderId])
 }
 
 function edit(id) {
@@ -199,20 +223,43 @@ function removeBatch() {
 }
 
 async function getData() {
-  let res = await baseListApi(props.baseFileUrl, page, {
-    'Content-Type': 'application/json', // 设置请求数据格式
-    'parent_folder_id': JSON.parse(localStorage.getItem('folderRootId')),
-  })
-  console.log(res)
-  if (res.code) {
-    message.error(res.msg)
-    return
+  if (props.isFabric) {
+    let res = await baseListApi(props.baseFileUrl, page, {
+      'Content-Type': 'application/json', // 设置请求数据格式
+    })
+    console.log(res)
+    if (res.code) {
+      message.error(res.msg)
+      return
+    }
+    data.list = res.data.map(item => ({
+      ...item,
+      data: JSON.stringify(item.data)
+    }))
+  } else if (props.isFolder) {
+    let res = await fileWithFolderApi(JSON.parse(localStorage.getItem('folderRootId')))
+    console.log(res)
+    if (res.code) {
+      message.error(res.msg)
+      return
+    }
+    data.list = res.data
+  } else {
+    let res = await baseListApi(props.baseFileUrl, page, {
+      'Content-Type': 'application/json', // 设置请求数据格式
+      'parent_folder_id': JSON.parse(localStorage.getItem('folderRootId')),
+    })
+    console.log(res)
+    if (res.code) {
+      message.error(res.msg)
+      return
+    }
+    data.list = res.data.list.map(item => ({
+      ...item,
+      type: typeMap[item.Type]
+    }))
+    data.count = res.data.count
   }
-  data.list = res.data.list.map(item => ({
-    ...item,
-    type: typeMap[item.Type]
-  }))
-  data.count = res.data.count
   data.spinning = false
 }
 

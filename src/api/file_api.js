@@ -43,3 +43,15 @@ export function fileDetailApi() {
     })
 }
 
+export function fileWithFolderApi(folderId) {
+    return Service.get("/api/query_file_with_folder", {
+        headers: {
+            "Content-Type": "application/json",
+            "parent_folder_id": folderId
+
+        }
+    })
+}
+
+
+

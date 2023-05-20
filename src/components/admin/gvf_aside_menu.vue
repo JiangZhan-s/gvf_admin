@@ -35,6 +35,8 @@
 import {reactive, ref} from "vue";
 import {useRouter, useRoute, onBeforeRouteUpdate} from "vue-router"
 import {useStore} from "@/stores/store";
+import {folderRootFindApi} from "../../api/folder_api";
+import {message} from "ant-design-vue";
 
 const store = useStore()
 const selectedKeys = ref([])
@@ -143,7 +145,7 @@ const data = reactive({
           id: 15,
           icon: "fa fa-database",
           title: "区块链信息",
-          name: "share_file",
+          name: "fabric",
           children: []
         }
       ]
@@ -162,13 +164,22 @@ const data = reactive({
 const router = useRouter()
 const route = useRoute()
 
-function goto(item) {
+async function goto(item) {
+  let res = await folderRootFindApi()
+  if (res.code) {
+    message.error(res.msg)
+    return
+  }
+  console.log(res.data)
+  store.setFolderRoot(res.data)
+
+
   store.addTab({
     name: item.key.name,
     title: item.key.title
   })
   //加入到 tabs
-  router.push({
+  await router.push({
     name: item.key.name,
   })
 }
@@ -178,7 +189,8 @@ function onOpenChange(openKeys) {
   data.openKeys = latestOpenKey ? [latestOpenKey] : []
 }
 
-function loadRoute(name) {
+async function loadRoute(name) {
+
   if (name === undefined) {
     name = route.name
   }

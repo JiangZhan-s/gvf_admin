@@ -7,7 +7,8 @@
       :is-folder="data.isFolder"
       :is-user="data.isUser"
       :is-role="data.isRole"
-      :is-login-data="data.isLoginData"
+      :is-setting="data.isSetting"
+      :is-fabric="data.isFabric"
       ref="gvfTable"
   >
   </GVFTable>
@@ -56,8 +57,8 @@ const data = reactive({
   isFolder: false,
   isUser: false,
   isRole: false,
-  isLoginData: true,
-
+  isSetting: true,
+  isFabric: false,
 })
 
 

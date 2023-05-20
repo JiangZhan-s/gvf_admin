@@ -57,6 +57,8 @@
       :is-folder="data.isFolder"
       :is-user="data.isUser"
       :is-role="data.isRole"
+      :is-setting="data.isSetting"
+      :is-fabric="data.isFabric"
       ref="gvfTable"
   >
   </GVFTable>
@@ -132,22 +134,34 @@ const data = reactive({
   isFolder: false,
   isUser: false,
   isRole: false,
+  isSetting: false,
+  isFabric: false,
 
   shareCode: "",
   isCheck: false,
   folderVisible: false,
   folderName: "",
 })
+
+
+const folderInfo = reactive({
+  folderName: "",
+  parentFolderId: 0,
+})
+
 const gvfTable = ref(null)
 
 async function handleFinish() {
   data.folderVisible = false
-  let res = await folderAddApi(JSON.parse(localStorage.getItem('folderRootId')), data.folderName)
+  folderInfo.folderName = data.folderName
+  folderInfo.parentFolderId = JSON.parse(localStorage.getItem('folderRootId'))
+  let res = await folderAddApi(folderInfo)
   if (res.code) {
     message.error("出错了！")
     return
   }
   message.success(res.msg)
+  gvf_table.value.refresh()
 }
 
 async function fileShare(fileId) {
