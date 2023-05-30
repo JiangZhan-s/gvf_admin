@@ -48,6 +48,10 @@ export const useStore = defineStore('gvf', {
         loadUserInfo() {
             let info = localStorage.getItem("userInfo")
             if (info === null) {
+                message.warn("用户未登录")
+                if (window.location.pathname !== "/login") {
+                    window.location.href = "/login";  // 替换为你的登录页面的URL
+                }
                 return
             }
             //先json解析
@@ -58,6 +62,9 @@ export const useStore = defineStore('gvf', {
             if (((exp * 1000) - nowTime) < 0) {
                 //过期了
                 message.warn("当前登录已失效")
+                if (window.location.pathname !== "/login") {
+                    window.location.href = "/login";  // 替换为你的登录页面的URL
+                }
                 return;
             }
             this.setUserInfo(userInfo)

@@ -4,7 +4,7 @@
       <div class="gvf_aside_header flex">
         <div class="gvf_aside_logo flex">
           <img
-              src="../../assets/images/logo.png"
+              src="../../assets/images/logo1.png"
               alt="">
         </div>
         <div class="gvf_aside_title">数据管理系统</div>
@@ -35,10 +35,10 @@ import GVFAsideMenu from "./gvf_aside_menu.vue"
   }
 
   .gvf_aside_logo {
-    padding: 10px;
+    padding: 8px;
 
     img {
-      width: 100%;
+      width: 88%;
     }
 
   }

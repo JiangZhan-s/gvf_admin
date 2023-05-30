@@ -16,25 +16,31 @@
       <div class="data_process">
         <div class="process_size">
           <div class="process_text">容量</div>
-          <a-tooltip title="3 done / 3 in progress / 4 to do">
-            <a-progress :percent="data.storePercent" :success="{ percent: data.storePercent }" type="circle"/>
+          <a-tooltip title="用户已使用的容量占比">
+            <a-progress :percent="parseFloat(data.storePercent)" :success="{ percent: parseFloat(data.storePercent) }"
+                        type="circle"/>
           </a-tooltip>
         </div>
         <div class="process_size">
           <div class="process_text">共享限额</div>
-          <a-tooltip title="3 done / 3 in progress / 4 to do">
+          <a-tooltip title="用户可分享文件限制">
             <a-progress :percent="5" :success="{ percent: 5 }" type="circle"/>
           </a-tooltip>
         </div>
         <div class="process_size">
-          <div class="process_text">容量</div>
-          <a-tooltip title="3 done / 3 in progress / 4 to do">
-            <a-progress :percent="data.storePercent" :success="{ percent: data.storePercent }" type="circle"/>
+          <div class="process_text">文件夹限制</div>
+          <a-tooltip title="用户可新建文件夹限制">
+            <a-progress :percent="6" :success="{ percent: 6 }" type="circle"/>
           </a-tooltip>
         </div>
       </div>
     </div>
     <div class="chart_item">
+    </div>
+  </div>
+  <div class="gvf_data_login">
+    <div class="process_chart">
+      <div class="chart_login"></div>
     </div>
   </div>
 </template>
@@ -43,6 +49,7 @@
 
 import {ref, reactive, onMounted} from "vue";
 import {queryStoreByUserIdApi} from "../../../api/store_api"
+import {getLoginCountApi} from "../../../api/user_api"
 import {fileDetailApi} from "../../../api/file_api"
 import * as echarts from 'echarts';
 
@@ -56,11 +63,11 @@ const data = reactive({
   sumDataList: [
     {
       label: "文件夹",
-      value: 21,
+      value: 6,
     },
     {
       label: "文件",
-      value: 60,
+      value: 8,
     },
     {
       label: "已分享",
@@ -72,10 +79,18 @@ const data = reactive({
     max_size: 0,
   },
   storePercent: 40,
-  detailUse: {}
+  detailUse: {},
+  loginCount: {},
+  xAxisData: {},
+  yAxisData: {}
 })
 
+let xAxisData = {}
+let yAxisData = {}
+
 const chartInstance = ref(null);
+
+const chartLogin = ref(null)
 
 async function getStoreInfo() {
   let res = await queryStoreByUserIdApi()
@@ -88,9 +103,8 @@ async function getStoreInfo() {
 async function getFileDetail() {
   let res = await fileDetailApi()
   data.detailUse = res.data
-  console.log(data.detailUse)
-  let chart = chartInstance.value
-  let updateOption = {
+  let chart1 = chartInstance.value
+  let updateOption1 = {
     series: [
       {
         name: '文件类型',
@@ -131,12 +145,71 @@ async function getFileDetail() {
       }
     ]
   };
-  chart.setOption(updateOption)
+  chart1.setOption(updateOption1)
+  console.log(res)
+  console.log(data.detailUse)
+  data.sumDataList[1] = {
+    label: "文件",
+    value: data.detailUse.docCount + data.detailUse.imgCount + data.detailUse.musicCount + data.detailUse.videoCount
+        + data.detailUse.otherCount
+  }
+
+  res = await getLoginCountApi()
+  data.loginCount = res.data
+  data.xAxisData = data.loginCount.map(item => item.date.split("T")[0]);// 日期数据
+  data.yAxisData = data.loginCount.map(item => item.count); // 次数数据
+  let chart2 = chartLogin.value
+  let updateOption2 = {
+    legend: {
+      data: ['登录次数']
+    },
+    xAxis: [
+      {
+        type: 'category',
+        boundaryGap: false,
+        data: data.xAxisData
+      }
+    ],
+    yAxis: [
+      {
+        type: 'value'
+      }
+    ],
+    series: [
+      {
+        name: '登录次数',
+        type: 'line',
+        smooth: true,
+        lineStyle: {
+          width: 0
+        },
+        showSymbol: false,
+        areaStyle: {
+          opacity: 0.8,
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            {
+              offset: 0,
+              color: 'rgb(50, 100, 255)'
+            },
+            {
+              offset: 1,
+              color: 'rgb(116, 21, 219)'
+            }
+          ])
+        },
+        emphasis: {
+          focus: 'series'
+        },
+        data: data.yAxisData
+      }
+    ]
+  }
+  chart2.setOption(updateOption2)
 }
 
 onMounted(() => {
-  const myChart = echarts.init(document.querySelector(".chart_item")); // 创建 echarts 实例
-  const option = {
+  const myChartFile = echarts.init(document.querySelector(".chart_item")); // 创建 echarts 实例
+  const optionFile = {
     title: {
       text: '文件使用明细',
       left: 'center',
@@ -153,8 +226,33 @@ onMounted(() => {
       bottom: 20,
     },
   };
-  myChart.setOption(option); // 绑定到容器中
-  chartInstance.value = myChart;
+  myChartFile.setOption(optionFile); // 绑定到容器中
+  chartInstance.value = myChartFile;
+
+  const myChartLogin = echarts.init(document.querySelector(".chart_login")); // 创建 echarts 实例
+  const optionLogin = {
+    color: ['#80FFA5', '#00DDFF', '#37A2FF', '#FF0087', '#FFBF00'],
+    title: {
+      text: '用户登陆概况'
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'cross',
+        label: {
+          backgroundColor: '#6a7985'
+        }
+      }
+    },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      containLabel: true
+    },
+  };
+  myChartLogin.setOption(optionLogin); // 绑定到容器中
+  chartLogin.value = myChartLogin;
 })
 
 getFileDetail()
@@ -166,6 +264,9 @@ getStoreInfo()
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-column-gap: 20px;
+  padding-top: 18px;
+  padding-right: 18px;
+  padding-left: 18px;
 }
 
 .preview_item {
@@ -207,6 +308,7 @@ getStoreInfo()
 }
 
 .gvf_data_item {
+  padding: 0 18px;
   display: flex;
 
   .process_item {
@@ -261,6 +363,29 @@ getStoreInfo()
     padding: 20px;
     flex-direction: column;
     height: 300px;
+  }
+}
+
+.gvf_data_login {
+  padding-top: 18px;
+  padding-right: 18px;
+  padding-left: 18px;
+  height: 296px;
+
+  .process_chart {
+    padding-top: 18px;
+    padding-right: 18px;
+    padding-left: 18px;
+    background-color: var(--card_bg);
+    border-radius: 5px;
+    border: 1px solid var(--card_border);
+    height: 100%;
+
+    .chart_login {
+      border-radius: 5px;
+      padding: 8px;
+      height: 100%;
+    }
   }
 }
 

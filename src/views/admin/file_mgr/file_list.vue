@@ -1,8 +1,25 @@
 <template>
-  <a-modal title="分享码" v-model:visible="data.isCheck" @ok="shareOk">
+  <a-modal title="分享码" v-model:visible="data.isCheck">
+    <template #footer>
+      <a-button key="submit" type="primary" @ok="shareOk"
+                style="margin-right: 16px"
+      >记住了
+      </a-button>
+    </template>
+    <div style="display: flex;flex-direction: column;">
+      <a-tag color="cyan" style="text-align: center;font-weight: bold">分享查询码</a-tag>
+      <a-tag color="#2db7f5" style="text-align: center">
+        22464bc3afd74d2f13ada8492084524be5768a2f3dec9249a89710d3b6acb5dc
+      </a-tag>
+      <a-tag color="green" style="text-align: center;font-weight: bold">分享提取码</a-tag>
+      <a-tag color="#87d068" style="text-align: center">
+        040f38fe
+      </a-tag>
+    </div>
     <span>{{ data.shareCode }}</span>
   </a-modal>
-  <a-modal title="上传文件" v-model:visible="data.modalVisible" @ok="handleOk" @cancel="handleCancel">
+  <a-modal title="上传文件" v-model:visible="data.modalVisible" @ok="handleOk" ok-text="确认上传" cancel-text="取消"
+           @cancel="handleCancel">
     <a-upload
         v-model:file-list="data.fileList"
         list-type="picture-card"
@@ -262,6 +279,7 @@ async function uploadFile(file) {
       // 创建包含二进制数据的Blob对象
       const blob = new Blob([arrayBuffer], {type: file.type});
       formData.append('file', blob, file.name);
+      formData.append('fileSize', file.size); // 添加文件大小字段
       data.uploadFileName = file.name
       let res = await fileUploadApi(formData, JSON.parse(localStorage.getItem('folderRootId')), {
         onUploadProgress: (progressEvent) => {

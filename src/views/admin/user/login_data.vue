@@ -21,6 +21,11 @@ import {reactive} from "vue";
 const data = reactive({
   columns: [
     {
+      title: "用户ID",
+      dataIndex: 'user_id',
+      key: 'user_id',
+    },
+    {
       title: "昵称",
       dataIndex: 'nick_name',
       key: 'nick_name',

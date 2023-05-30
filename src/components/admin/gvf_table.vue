@@ -55,6 +55,10 @@
             <template v-if="column.key==='token'">
               <span style="width: 400px; display: inline-block">{{ record.token }}</span>
             </template>
+            <template v-if="column.key==='dataType'">
+              <a-tag color="orange" v-if="record.dataType==='Data'">{{ record.dataType }}</a-tag>
+              <a-tag color="purple" v-if="record.dataType==='Share'">{{ record.dataType }}</a-tag>
+            </template>
             <template v-if="column.key==='action'">
               <slot name="code" v-bind="{column,record}" v-if="props.isShare">
                 <a-button class="gvf_table_action code" @click="checkShareCode(record.ID)" type="primary">查看分享码
@@ -79,6 +83,10 @@
               >
                 <a-button class="gvf_table_action delete" type="danger">删除</a-button>
               </a-popconfirm>
+            </template>
+            <template v-if="column.key==='Action'">
+              <a-tag color="red" v-if="record.Action==='创建分享'">{{ record.Action }}</a-tag>
+              <a-tag color="blue" v-else-if="record.Action==='上传文件'">{{ record.Action }}</a-tag>
             </template>
             <template v-if="column.key==='name'&&!record.is_file">
               <i class="fa fa-folder-o" style="margin-right: 10px;color: blue"></i>
@@ -156,7 +164,7 @@ const emits = defineEmits(["delete", "download", "upload", "share",
   "code", "folder_add", "user_add", "edit", "folder_change"])
 const page = reactive({
   page: 1,
-  limit: 5,
+  limit: 7,
 })
 const data = reactive({
   list: [],
@@ -313,6 +321,7 @@ defineExpose({
   }
 
   .gvf_tables {
+    min-height: 536px;
     padding: 10px;
   }
 

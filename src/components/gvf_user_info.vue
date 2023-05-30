@@ -6,7 +6,7 @@
     <div class="drop_menu">
       <a-dropdown placement="bottomRight">
         <a class="ant-dropdown-link" @click.prevent>
-          江湛
+          {{ userNick }}
           <i class="fa fa-angle-down"></i>
         </a>
         <template #overlay>
@@ -35,7 +35,10 @@
 import {useRoute, useRouter} from "vue-router";
 import {logoutApi} from "../api/user_api";
 import {message} from "ant-design-vue";
+import {useStore} from "@/stores/store";
+import {reactive} from "vue";
 
+const store = useStore()
 const route = useRoute()
 const router = useRouter()
 const props = defineProps({
@@ -45,6 +48,7 @@ const props = defineProps({
     default: false,
   }
 })
+const userNick = store.userInfo.nick_name
 
 async function userLogout() {
   let res = await logoutApi();

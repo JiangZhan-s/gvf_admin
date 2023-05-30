@@ -95,7 +95,7 @@ import GVFTabs from "../../components/admin/gvf_tabs.vue"
     }
 
     main {
-      padding: 20px;
+      padding: 2px;
     }
   }
 }

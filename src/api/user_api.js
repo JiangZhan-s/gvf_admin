@@ -52,3 +52,11 @@ export function getCityFromIP(ip) {
             throw error;
         });
 }
+
+export function getLoginCountApi() {
+    return Service.get("/api/query_login_count", {
+        headers: {
+            "Content-Type": "application/json",
+        }
+    })
+}
