@@ -20,3 +20,23 @@ export function parentIdFindApi(folderId) {
         },
     })
 }
+
+export function folderUploadApi(folderInfo) {
+    return Service.post("/api/upload", data, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+            "parent_folder_id": folderInfo.parentFolderId,
+            "folder_name": folderInfo.folderName
+        },
+    })
+}
+
+
+export function folderDeleteApi(folderId) {
+    return Service.post("/api/folder_delete", "", {
+        headers: {
+            "Content-Type": "multipart/form-data",
+            "folder_id": folderId,
+        },
+    })
+}

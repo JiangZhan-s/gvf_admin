@@ -12,7 +12,8 @@
           </div>
           <div class="input-field">
             <i class="fa fa-lock"></i>
-            <a-input type="password" class="input-new" placeholder="密码" v-model:value="data.password">
+            <a-input class="input-new" type="password" placeholder="密码"
+                     v-model:value="data.password">
             </a-input>
           </div>
           <input type="button" value="登 录" id="LoginButton" class="btn solid" @click="emailLogin"/>
@@ -22,17 +23,41 @@
           <h2 class="title">注册</h2>
           <div class="input-field">
             <i class="fa fa-user"></i>
-            <input type="text" placeholder="用户名"/>
+            <a-input class="input-new" @input="validateUsername" placeholder="用户名"
+                     v-model:value="register.user_name"/>
+            <span class="error-bubble" v-if="!isUsernameValid">{{ usernameError }}</span>
+          </div>
+          <div class="input-field">
+            <i class="fa fa-address-card"></i>
+            <a-input class="input-new" placeholder="昵称"
+                     v-model:value="register.nick_name"/>
           </div>
           <div class="input-field">
             <i class="fa fa-envelope"></i>
-            <input type="email" placeholder="邮箱"/>
+            <a-input class="input-new" @input="validateEmail" type="email" placeholder="邮箱"
+                     v-model:value="register.email"/>
+            <span class="error-bubble" v-if="!isEmailValid">邮箱格式不正确</span>
+          </div>
+          <div class="input-field">
+            <i class="fa fa-phone"></i>
+            <a-input class="input-new" @input="validatePhoneNumber" placeholder="手机号"
+                     v-model:value="register.tel"/>
+            <span class="error-bubble" v-if="!isPhoneNumberValid">手机号格式不正确</span>
           </div>
           <div class="input-field">
             <i class="fa fa-lock"></i>
-            <input type="password" placeholder="密码"/>
+            <a-input type="password" class="input-new" placeholder="密码"
+                     v-model:value="register.password" @input="validatePassword"/>
+            <span class="error-bubble" v-if="!isPasswordValid">至少包含一个大写字母、一个小写字母和一个数字，长度在6到20之间</span>
           </div>
-          <input type="submit" class="btn" value="注 册"/>
+          <div class="input-field">
+            <i class="fa fa-lock"></i>
+            <a-input class="input-new" type="password" placeholder="确认密码"
+                     v-model:value="register.rePassword" @input="validateRePassword"/>
+            <span class="error-bubble" v-if="!isRePasswordValid">两次密码不一致</span>
+
+          </div>
+          <input type="submit" class="btn" value="注 册" @click="SignUp"/>
         </form>
       </div>
     </div>
@@ -71,7 +96,7 @@
 
 import {reactive, ref} from "vue";
 import {message} from 'ant-design-vue';
-import {emailLoginApi, getUserIPApi, getCityFromIP} from "../api/user_api";
+import {emailLoginApi, getUserIPApi, getCityFromIP, signUpApi} from "../api/user_api";
 import {parseToken} from "../utils/jwt";
 import {useStore} from "@/stores/store";
 import {useRoute, useRouter} from "vue-router";
@@ -80,15 +105,13 @@ import {folderRootFindApi} from "../api/folder_api";
 const route = useRoute()
 const router = useRouter()
 const store = useStore()
-
+const isEmailValid = ref(true)
+const isPasswordValid = ref(true)
+const isPhoneNumberValid = ref(true);
+const isRePasswordValid = ref(true);
+const isUsernameValid = ref(true);
+const usernameError = ref('');
 const isSignUpMode = ref(false);
-const showSignUp = () => {
-  isSignUpMode.value = true;
-};
-
-const showSignIn = () => {
-  isSignUpMode.value = false;
-};
 
 
 const data = reactive({
@@ -97,6 +120,57 @@ const data = reactive({
   ip: "",
   city: "",
 })
+
+const register = reactive({
+  user_name: "",
+  nick_name: "",
+  password: "",
+  rePassword: "",
+  email: "",
+  tel: ""
+})
+
+// 手机号格式检测
+const validatePhoneNumber = () => {
+  const phoneNumberRegex = /^1[0-9]{10}$/; // 11位数字，以1开头
+  isPhoneNumberValid.value = phoneNumberRegex.test(register.tel);
+};
+
+const validateRePassword = () => {
+  isRePasswordValid.value = (register.password === register.rePassword)
+}
+
+const validateUsername = () => {
+  isUsernameValid.value = false
+  if (register.user_name.length < 3 || register.user_name.length > 10) {
+    usernameError.value = '用户名长度必须在3到10个字符之间';
+  } else if (!/^[a-zA-Z0-9_-]+$/.test(register.user_name)) {
+    usernameError.value = '用户名只能包含字母、数字、下划线和减号';
+  } else {
+    usernameError.value = '';
+    isUsernameValid.value = true
+  }
+}
+
+const validatePassword = () => {
+  // 密码要求：至少包含一个大写字母、一个小写字母和一个数字，长度在6到20之间
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,20}$/;
+  isPasswordValid.value = passwordRegex.test(register.password);
+}
+
+const validateEmail = () => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  isEmailValid.value = emailRegex.test(register.email);
+}
+
+const showSignUp = () => {
+  isSignUpMode.value = true;
+};
+
+const showSignIn = () => {
+  isSignUpMode.value = false;
+};
+
 
 async function getUserIP() {
   let res = await getUserIPApi()
@@ -116,8 +190,8 @@ async function emailLogin() {
     message.error("请输入密码")
     return
   }
-
-  await getUserIP()
+  //获取用户IP，由于网络延迟，暂不使用
+  // await getUserIP()
   let res = await emailLoginApi(data)
   if (res.code) {
     message.error(res.msg)
@@ -155,6 +229,25 @@ async function emailLogin() {
   setTimeout(() => {
     router.push({path: redirect_url})
   }, 1000)
+}
+
+async function SignUp() {
+  if (!isUsernameValid || !isRePasswordValid ||
+      !isPhoneNumberValid || !isPasswordValid ||
+      !isEmailValid
+  ) {
+    message.warn("请检查输入格式是否是正确")
+    return
+  }
+  let res = await signUpApi(register)
+  if (res.code) {
+    message.error(res.msg)
+    return
+  }
+  message.success(res.msg)
+  setTimeout(() => {
+    router.push({name: "login"})
+  }, 2000)
 }
 
 </script>
@@ -208,6 +301,13 @@ form.sign-up-form {
 
 form.sign-in-form {
   z-index: 2;
+}
+
+.error-bubble {
+  padding-left: 32px;
+  display: inline-block;
+  color: red;
+  width: 500px;
 }
 
 .title {

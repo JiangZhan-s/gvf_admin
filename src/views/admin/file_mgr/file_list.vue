@@ -92,7 +92,7 @@ import {useStore} from "@/stores/store";
 import GVFTable from "../../../components/admin/gvf_table.vue"
 import GVFProgress from "../../../components/progressDialog/ProgressDialog.vue"
 import {reactive} from "vue";
-import {fileDownloadApi, fileUploadApi, fileBatchUploadApi} from "../../../api/file_api";
+import {fileDownloadApi, fileUploadApi, fileBatchUploadApi, fileDeleteApi} from "../../../api/file_api";
 import {folderAddApi} from "../../../api/folder_api"
 import {saveAs} from "file-saver"
 import {message} from "ant-design-vue";
@@ -168,6 +168,7 @@ const folderInfo = reactive({
 
 const gvfTable = ref(null)
 
+//新建文件夹
 async function handleFinish() {
   data.folderVisible = false
   folderInfo.folderName = data.folderName
@@ -334,8 +335,15 @@ async function fileDownload(fileIdList) {
 
 }
 
-function fileDelete(fileIdList) {
+async function fileDelete(fileIdList) {
   console.log(fileIdList)
+  let res = await fileDeleteApi(fileIdList)
+  if (res.code) {
+    message.error(res.msg)
+    return
+  }
+  message.success(res.msg)
+  gvfTable.value.refresh()
 }
 
 function folderAdd() {

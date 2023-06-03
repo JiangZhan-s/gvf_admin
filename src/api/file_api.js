@@ -1,5 +1,4 @@
 import {Service} from "../service/service";
-import axios from "axios";
 
 export function fileUploadApi(data, folderId, config) {
     return Service.post("/api/upload", data, {
@@ -52,6 +51,17 @@ export function fileWithFolderApi(folderId) {
         }
     })
 }
+
+export function fileDeleteApi(fileId) {
+    return Service.post("/api/file_delete", "", {
+        headers: {
+            "Content-Type": "application/json",
+            "file_id": fileId
+
+        }
+    })
+}
+
 
 
 

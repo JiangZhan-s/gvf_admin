@@ -7,6 +7,12 @@ export function emailLoginApi(data) {
     })
 }
 
+export function signUpApi(data) {
+    return Service.post("/api/sign_up", data, {
+        headers: {},
+    })
+}
+
 export function logoutApi() {
     return Service.post("/api/logout", "", {
         headers: {}

@@ -79,7 +79,16 @@
                   ok-text="删除"
                   cancel-text="取消"
                   @confirm="remove(record.ID)"
-                  v-if="props.isFile||props.isFolder||props.isUser||props.isRole"
+                  v-if="props.isFile||props.isUser||props.isRole"
+              >
+                <a-button class="gvf_table_action delete" type="danger">删除</a-button>
+              </a-popconfirm>
+              <a-popconfirm
+                  title="是否确定删除？"
+                  ok-text="删除"
+                  cancel-text="取消"
+                  @confirm="removeFolder(record.ID,record.is_file)"
+                  v-if="props.isFolder"
               >
                 <a-button class="gvf_table_action delete" type="danger">删除</a-button>
               </a-popconfirm>
@@ -90,7 +99,7 @@
             </template>
             <template v-if="column.key==='name'&&!record.is_file">
               <i class="fa fa-folder-o" style="margin-right: 10px;color: blue"></i>
-              <a href="javascript:void(0)" @click="changeFolder(record.id)" style="font-weight: 800">{{
+              <a href="javascript:void(0)" @click="changeFolder(record.ID)" style="font-weight: 800">{{
                   record.name
                 }}</a>
             </template>
@@ -161,7 +170,7 @@ const props = defineProps({
   }
 })
 const emits = defineEmits(["delete", "download", "upload", "share",
-  "code", "folder_add", "user_add", "edit", "folder_change"])
+  "code", "folder_add", "user_add", "edit", "folder_change", "delete_folder"])
 const page = reactive({
   page: 1,
   limit: 7,
@@ -225,6 +234,12 @@ function downloadBatch() {
 function remove(id) {
   emits("delete", [id])
 }
+
+//删除单个
+function removeFolder(id, isFile) {
+  emits("delete_folder", [id, isFile])
+}
+
 
 function removeBatch() {
   emits("delete", data.selectedRowKeys)
