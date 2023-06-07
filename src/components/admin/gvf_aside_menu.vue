@@ -50,13 +50,6 @@ const data = reactive({
       children: []
     },
     {
-      id: 2,
-      icon: "fa-upload",//图标统一用fa
-      title: "上传文件",//菜单名称
-      name: "upload",//路由名称
-      children: []
-    },
-    {
       id: 3,
       icon: "fa-folder-open",//图标统一用fa
       title: "全部文件",//菜单名称

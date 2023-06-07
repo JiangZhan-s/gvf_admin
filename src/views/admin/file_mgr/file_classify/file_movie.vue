@@ -1,8 +1,24 @@
 <template>
-  <a-modal title="分享码" v-model:visible="data.isCheck" @ok="shareOk">
-    <span>{{ data.shareCode }}</span>
+  <a-modal title="分享码" v-model:visible="data.isCheck">
+    <template #footer>
+      <a-button key="submit" type="primary" @click="shareOk"
+                style="margin-right: 16px"
+      >记住了
+      </a-button>
+    </template>
+    <div style="display: flex;flex-direction: column;">
+      <a-tag color="cyan" style="text-align: center;font-weight: bold">分享查询码</a-tag>
+      <a-tag color="#2db7f5" style="text-align: center">
+        22464bc3afd74d2f13ada8492084524be5768a2f3dec9249a89710d3b6acb5dc
+      </a-tag>
+      <a-tag color="green" style="text-align: center;font-weight: bold">分享提取码</a-tag>
+      <a-tag color="#87d068" style="text-align: center">
+        040f38fe
+      </a-tag>
+    </div>
   </a-modal>
-  <a-modal title="上传文件" v-model:visible="data.modalVisible" @ok="handleOk" @cancel="handleCancel">
+  <a-modal title="上传文件" v-model:visible="data.modalVisible" @ok="handleOk" ok-text="确认上传" cancel-text="取消"
+           @cancel="handleCancel">
     <a-upload
         v-model:file-list="data.fileList"
         list-type="picture-card"
@@ -51,8 +67,14 @@
       @delete="fileDelete" @download="fileDownload" @upload="fileUploadModal" @share="fileShare"
       @folder_add="folderAdd"
       :columns="data.columns"
-      base-file-url="/api/query_all"
+      base-file-url="/api/query_file_by_type?type=4"
       :is-share="data.isShare"
+      :is-file="data.isFile"
+      :is-folder="data.isFolder"
+      :is-user="data.isUser"
+      :is-role="data.isRole"
+      :is-setting="data.isSetting"
+      :is-fabric="data.isFabric"
       ref="gvfTable"
   >
   </GVFTable>
@@ -69,16 +91,11 @@ import {useStore} from "@/stores/store";
 import GVFTable from "../../../../components/admin/gvf_table.vue"
 import GVFProgress from "../../../../components/progressDialog/ProgressDialog.vue"
 import {reactive} from "vue";
-import {fileDownloadApi, fileUploadApi, fileBatchUploadApi} from "../../../../api/file_api";
+import {fileDownloadApi, fileUploadApi, fileBatchUploadApi, fileDeleteApi} from "../../../../api/file_api";
 import {folderAddApi} from "../../../../api/folder_api"
 import {saveAs} from "file-saver"
 import {message} from "ant-design-vue";
 import {shareGenerateApi} from "../../../../api/share_api";
-
-function test(...params) {
-  params[0].onSuccess()
-  console.log(params)
-}
 
 const store = useStore()
 
@@ -127,22 +144,41 @@ const data = reactive({
   uploadProgress: 0,
   isUploadProgressShow: false,
   uploadFileName: "",
+
   isShare: false,
+  isFile: true,
+  isFolder: false,
+  isUser: false,
+  isRole: false,
+  isSetting: false,
+  isFabric: false,
+
   shareCode: "",
   isCheck: false,
   folderVisible: false,
   folderName: "",
 })
+
+
+const folderInfo = reactive({
+  folderName: "",
+  parentFolderId: 0,
+})
+
 const gvfTable = ref(null)
 
+//新建文件夹
 async function handleFinish() {
   data.folderVisible = false
-  let res = await folderAddApi(JSON.parse(localStorage.getItem('folderRootId')), data.folderName)
+  folderInfo.folderName = data.folderName
+  folderInfo.parentFolderId = JSON.parse(localStorage.getItem('folderRootId'))
+  let res = await folderAddApi(folderInfo)
   if (res.code) {
     message.error("出错了！")
     return
   }
   message.success(res.msg)
+  gvf_table.value.refresh()
 }
 
 async function fileShare(fileId) {
@@ -243,6 +279,7 @@ async function uploadFile(file) {
       // 创建包含二进制数据的Blob对象
       const blob = new Blob([arrayBuffer], {type: file.type});
       formData.append('file', blob, file.name);
+      formData.append('fileSize', file.size); // 添加文件大小字段
       data.uploadFileName = file.name
       let res = await fileUploadApi(formData, JSON.parse(localStorage.getItem('folderRootId')), {
         onUploadProgress: (progressEvent) => {
@@ -297,8 +334,15 @@ async function fileDownload(fileIdList) {
 
 }
 
-function fileDelete(fileIdList) {
+async function fileDelete(fileIdList) {
   console.log(fileIdList)
+  let res = await fileDeleteApi(fileIdList)
+  if (res.code) {
+    message.error(res.msg)
+    return
+  }
+  message.success(res.msg)
+  gvfTable.value.refresh()
 }
 
 function folderAdd() {

@@ -62,6 +62,3 @@ export function fileDeleteApi(fileId) {
     })
 }
 
-
-
-

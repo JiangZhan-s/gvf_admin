@@ -24,13 +24,15 @@
         <div class="process_size">
           <div class="process_text">共享限额</div>
           <a-tooltip title="用户可分享文件限制">
-            <a-progress :percent="5" :success="{ percent: 5 }" type="circle"/>
+            <a-progress :percent="parseFloat(data.sharePercent)" :success="{ percent: parseFloat(data.sharePercent)}"
+                        type="circle"/>
           </a-tooltip>
         </div>
         <div class="process_size">
           <div class="process_text">文件夹限制</div>
           <a-tooltip title="用户可新建文件夹限制">
-            <a-progress :percent="6" :success="{ percent: 6 }" type="circle"/>
+            <a-progress :percent="parseFloat(data.folderPercent)" :success="{ percent: parseFloat(data.folderPercent)}"
+                        type="circle"/>
           </a-tooltip>
         </div>
       </div>
@@ -51,6 +53,8 @@ import {ref, reactive, onMounted} from "vue";
 import {queryStoreByUserIdApi} from "../../../api/store_api"
 import {getLoginCountApi} from "../../../api/user_api"
 import {fileDetailApi} from "../../../api/file_api"
+import {folderCountApi} from "../../../api/folder_api"
+import {shareCountApi} from "../../../api/share_api"
 import * as echarts from 'echarts';
 
 const iconList = [
@@ -79,6 +83,8 @@ const data = reactive({
     max_size: 0,
   },
   storePercent: 40,
+  sharePercent: 0,
+  folderPercent: 0,
   detailUse: {},
   loginCount: {},
   xAxisData: {},
@@ -205,6 +211,21 @@ async function getFileDetail() {
     ]
   }
   chart2.setOption(updateOption2)
+
+  res = await folderCountApi()
+  data.sumDataList[0] = {
+    label: "文件夹",
+    value: res.data
+  }
+  data.folderPercent = data.sumDataList[0].value * 100 / 100
+  data.folderPercent = data.folderPercent.toFixed(2)
+  res = await shareCountApi()
+  data.sumDataList[2] = {
+    label: "分享",
+    value: res.data
+  }
+  data.sharePercent = data.sumDataList[2].value * 100 / 150
+  data.sharePercent = data.sharePercent.toFixed(2)
 }
 
 onMounted(() => {

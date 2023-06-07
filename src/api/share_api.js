@@ -46,3 +46,11 @@ export function getCodeByIdApi(fileId) {
         },
     })
 }
+
+export function shareCountApi(folderId) {
+    return Service.get("/api/query_share_count", {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    })
+}

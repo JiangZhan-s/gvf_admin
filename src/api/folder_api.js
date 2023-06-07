@@ -40,3 +40,11 @@ export function folderDeleteApi(folderId) {
         },
     })
 }
+
+export function folderCountApi(folderId) {
+    return Service.get("/api/query_folder_count", {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    })
+}

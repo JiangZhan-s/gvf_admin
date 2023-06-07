@@ -1,7 +1,7 @@
 <template>
   <a-modal title="分享码" v-model:visible="data.isCheck">
     <template #footer>
-      <a-button key="submit" type="primary" @ok="shareOk"
+      <a-button key="submit" type="primary" @click="shareOk"
                 style="margin-right: 16px"
       >记住了
       </a-button>
@@ -16,7 +16,6 @@
         040f38fe
       </a-tag>
     </div>
-    <span>{{ data.shareCode }}</span>
   </a-modal>
   <a-modal title="上传文件" v-model:visible="data.modalVisible" @ok="handleOk" ok-text="确认上传" cancel-text="取消"
            @cancel="handleCancel">
@@ -312,27 +311,29 @@ function fileUploadModal() {
 }
 
 async function fileDownload(fileIdList) {
-  let res = await fileDownloadApi(fileIdList);
-  try {
-    let contentDisposition = res.headers['content-disposition']; // 获取响应头部中的Content-Disposition字段
-    let fileName = null;
-    let matches = contentDisposition.match(/filename\*?=(UTF-8''|")(.*?)\1/); // 从Content-Disposition中提取编码后的文件名
-    if (matches && matches.length > 2) {
-      fileName = decodeURIComponent(matches[2]); // 解码文件名
-    } else {
-      matches = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/); // 从Content-Disposition中提取未编码的文件名
-      if (matches && matches.length > 1) {
-        fileName = decodeURIComponent(matches[1].replace(/^.*?''/, '')); // 处理文件名
+  for (let index = 0; index < fileIdList.length; index++) {
+    console.log(fileIdList[index])
+    let res = await fileDownloadApi(fileIdList[index]);
+    try {
+      let contentDisposition = res.headers['content-disposition']; // 获取响应头部中的Content-Disposition字段
+      let fileName = null;
+      let matches = contentDisposition.match(/filename\*?=(UTF-8''|")(.*?)\1/); // 从Content-Disposition中提取编码后的文件名
+      if (matches && matches.length > 2) {
+        fileName = decodeURIComponent(matches[2]); // 解码文件名
+      } else {
+        matches = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/); // 从Content-Disposition中提取未编码的文件名
+        if (matches && matches.length > 1) {
+          fileName = decodeURIComponent(matches[1].replace(/^.*?''/, '')); // 处理文件名
+        }
       }
+      const fileData = new Blob([res.data], {type: 'application/octet-stream'}); // 创建 Blob 对象
+      saveAs(fileData, fileName); // 使用 saveAs 方法保存文件数据
+      console.log(res)
+    } catch (error) {
+      console.log(error)
+      message.error("数据可能被篡改，拒绝下载请求")
     }
-    const fileData = new Blob([res.data], {type: 'application/octet-stream'}); // 创建 Blob 对象
-    saveAs(fileData, fileName); // 使用 saveAs 方法保存文件数据
-    console.log(res)
-  } catch (error) {
-    console.log(error)
-    message.error("数据可能被篡改，拒绝下载请求")
   }
-
 }
 
 async function fileDelete(fileIdList) {
