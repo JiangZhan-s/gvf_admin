@@ -88,6 +88,7 @@ const data = reactive({
 
 async function onSearch(hashValue) {
   let res = await getShareInfoByHashApi(hashValue)
+  console.log(res)
   if (res.code) {
     data.shareInfo.file_id = 0
     message.error(res.msg)

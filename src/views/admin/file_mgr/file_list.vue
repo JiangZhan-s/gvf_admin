@@ -9,11 +9,11 @@
     <div style="display: flex;flex-direction: column;">
       <a-tag color="cyan" style="text-align: center;font-weight: bold">分享查询码</a-tag>
       <a-tag color="#2db7f5" style="text-align: center">
-        22464bc3afd74d2f13ada8492084524be5768a2f3dec9249a89710d3b6acb5dc
+        {{ data.queryCode }}
       </a-tag>
       <a-tag color="green" style="text-align: center;font-weight: bold">分享提取码</a-tag>
       <a-tag color="#87d068" style="text-align: center">
-        040f38fe
+        {{ data.extractCode }}
       </a-tag>
     </div>
   </a-modal>
@@ -154,6 +154,8 @@ const data = reactive({
   isFabric: false,
 
   shareCode: "",
+  queryCode: "",
+  extractCode: "",
   isCheck: false,
   folderVisible: false,
   folderName: "",
@@ -191,6 +193,13 @@ async function fileShare(fileId) {
   message.success(res.data)
   data.isCheck = true
   data.shareCode = res.data
+  let queryCodeIndex = data.shareCode.indexOf("分享查询码是");
+  let semicolonIndex = data.shareCode.indexOf("；");
+  data.queryCode = data.shareCode.substring(queryCodeIndex + 6, semicolonIndex);
+
+// 提取提取码
+  let extractCodeIndex = data.shareCode.indexOf("分享提取码是");
+  data.extractCode = data.shareCode.substring(extractCodeIndex + 6);
 }
 
 function shareOk() {
